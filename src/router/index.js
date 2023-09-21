@@ -9,6 +9,27 @@ const routes = [
     component: HomeView,
   },
   {
+    path: '/forum/:id',
+    name: 'Forum',
+    props: true,
+    component: () => import('@/views/ForumView.vue'),
+    beforeEnter: (to) => {
+      const forumExists = sourceData.forums.find(
+        (forum) => forum.id === to.params.id
+      )
+      if (!forumExists) {
+        return {
+          name: 'NotFound',
+          params: {
+            pathMatch: to.path.substring(1).split('/'),
+          },
+          query: to.query,
+          hash: to.hash,
+        }
+      }
+    },
+  },
+  {
     path: '/thread/:id',
     name: 'Thread',
     props: true,
