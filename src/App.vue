@@ -1,5 +1,7 @@
 <template>
-  <h1 class="text-primary">Hello World</h1>
+  <div class="container">
+    <RouterView></RouterView>
+  </div>
 </template>
 
 <script setup></script>
