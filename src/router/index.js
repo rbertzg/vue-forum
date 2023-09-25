@@ -9,6 +9,27 @@ const routes = [
     component: HomeView,
   },
   {
+    path: '/category/:id',
+    name: 'Category',
+    props: true,
+    component: () => import('@/views/CategoryView.vue'),
+    beforeEnter: (to) => {
+      const categoryExists = sourceData.categories.find(
+        (category) => category.id === to.params.id
+      )
+      if (!categoryExists) {
+        return {
+          name: 'NotFound',
+          params: {
+            pathMatch: to.path.substring(1).split('/'),
+          },
+          query: to.query,
+          hash: to.hash,
+        }
+      }
+    },
+  },
+  {
     path: '/forum/:id',
     name: 'Forum',
     props: true,

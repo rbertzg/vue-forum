@@ -10,23 +10,24 @@
 </template>
 
 <script setup>
-  import sourceData from '@/data.json'
-  import { computed, ref } from 'vue'
+  import { computed } from 'vue'
   import PostList from '../components/PostList.vue'
   import PostReply from '../components/PostReply.vue'
+  import { useStore } from '../stores/Store'
 
   const props = defineProps({
     id: { type: String, required: true },
   })
+  const store = useStore()
 
-  const threads = ref(sourceData.threads)
-  const posts = ref(sourceData.posts)
+  const threads = store.data.threads
+  const posts = store.data.posts
 
   const thread = computed(() =>
-    threads.value.find((thread) => thread.id === props.id)
+    threads.find((thread) => thread.id === props.id)
   )
   const threadPosts = computed(() =>
-    posts.value.filter((post) => post.threadId === props.id)
+    posts.filter((post) => post.threadId === props.id)
   )
 
   const handleReply = (replyText) => {

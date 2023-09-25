@@ -1,12 +1,13 @@
 <template>
   <h1>Welcome to the Forum</h1>
-  <ForumList :forums="forums" />
+  <CategoryList :categories="categories" />
 </template>
 
 <script setup>
-import sourceData from '@/data.json';
-import { ref } from 'vue';
-import ForumList from '../components/ForumList.vue';
+  import CategoryList from '../components/CategoryList.vue'
+  import { useStore } from '../stores/Store'
 
-const forums = ref(sourceData.forums)
+  const store = useStore()
+
+  const categories = store.data.categories
 </script>

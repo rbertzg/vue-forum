@@ -29,14 +29,15 @@
 </template>
 
 <script setup>
-  import sourceData from '@/data.json'
-  import { ref } from 'vue'
+  import { useStore } from '../stores/Store'
   import AppDate from './AppDate.vue'
 
   defineProps({
     post: { type: Object, required: true },
   })
 
-  const users = ref(sourceData.users)
-  const getUserById = (id) => users.value.find((user) => user.id === id)
+  const store = useStore()
+
+  const users = store.data.users
+  const getUserById = (id) => users.find((user) => user.id === id)
 </script>

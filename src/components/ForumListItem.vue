@@ -1,7 +1,10 @@
 <template>
   <div class="forum-listing">
     <div class="forum-details">
-      <RouterLink :to="{ name: 'Forum', params: { id: forum.id } }" class="text-xlarge">
+      <RouterLink
+        :to="{ name: 'Forum', params: { id: forum.id } }"
+        class="text-xlarge"
+      >
         {{ forum.name }}
       </RouterLink>
       <p>{{ forum.description }}</p>
@@ -17,15 +20,15 @@
 </template>
 
 <script setup>
-defineProps({
-  forum: { type: Object, required: true }
-})
+  defineProps({
+    forum: { type: Object, required: true },
+  })
 
-const threadsCount = (threads) => {
-  if (threads) {
-    return threads.length > 1 ? "threads" : 'thread'
-  } else {
-    return 'No threads'
+  const threadsCount = (threads) => {
+    if (threads) {
+      return threads.length > 1 ? 'threads' : 'thread'
+    } else {
+      return 'No threads'
+    }
   }
-}
 </script>
