@@ -17,23 +17,26 @@
 
 <script setup>
   import { computed } from 'vue'
-  import { useStore } from '../stores/Store'
+  import { useCategoriesStore } from '../stores/CategoriesStore'
+  import { useForumsStore } from '../stores/ForumsStore'
   import ForumListItem from './ForumListItem.vue'
 
   const props = defineProps({
     categoryId: { type: String, required: true },
   })
 
-  const store = useStore()
-
-  const categories = store.data.categories
-  const forums = store.data.forums
+  const categoriesStore = useCategoriesStore()
+  const forumsStore = useForumsStore()
 
   const categoryName = computed(() => {
-    return categories.find((category) => category.id === props.categoryId).name
+    return categoriesStore.categories.find(
+      (category) => category.id === props.categoryId
+    ).name
   })
 
   const categoryForums = computed(() => {
-    return forums.filter((forum) => forum.categoryId === props.categoryId)
+    return forumsStore.forums.filter(
+      (forum) => forum.categoryId === props.categoryId
+    )
   })
 </script>

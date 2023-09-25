@@ -1,4 +1,6 @@
-import sourceData from '@/data.json'
+import { useCategoriesStore } from '@/stores/CategoriesStore'
+import { useForumsStore } from '@/stores/ForumsStore'
+import { useThreadsStore } from '@/stores/ThreadsStore'
 import HomeView from '@/views/HomeView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
@@ -14,7 +16,8 @@ const routes = [
     props: true,
     component: () => import('@/views/CategoryView.vue'),
     beforeEnter: (to) => {
-      const categoryExists = sourceData.categories.find(
+      const categoriesStore = useCategoriesStore()
+      const categoryExists = categoriesStore.categories.find(
         (category) => category.id === to.params.id
       )
       if (!categoryExists) {
@@ -35,7 +38,8 @@ const routes = [
     props: true,
     component: () => import('@/views/ForumView.vue'),
     beforeEnter: (to) => {
-      const forumExists = sourceData.forums.find(
+      const forumsStore = useForumsStore()
+      const forumExists = forumsStore.forums.find(
         (forum) => forum.id === to.params.id
       )
       if (!forumExists) {
@@ -56,7 +60,8 @@ const routes = [
     props: true,
     component: () => import('@/views/ThreadView.vue'),
     beforeEnter: (to) => {
-      const threadExists = sourceData.threads.find(
+      const threadsStore = useThreadsStore()
+      const threadExists = threadsStore.threads.find(
         (thread) => thread.id === to.params.id
       )
       if (!threadExists) {

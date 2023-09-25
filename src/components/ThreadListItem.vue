@@ -32,15 +32,13 @@
 </template>
 
 <script setup>
-  import { useStore } from '../stores/Store'
+  import { useUsersStore } from '../stores/UsersStore'
   import AppDate from './AppDate.vue'
 
   defineProps({
     thread: { type: Object, required: true },
   })
 
-  const store = useStore()
-
-  const users = store.data.users
-  const getUserById = (id) => users.find((user) => user.id === id)
+  const usersStore = useUsersStore()
+  const getUserById = (id) => usersStore.users.find((user) => user.id === id)
 </script>

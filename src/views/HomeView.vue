@@ -1,13 +1,11 @@
 <template>
   <h1>Welcome to the Forum</h1>
-  <CategoryList :categories="categories" />
+  <CategoryList :categories="categoriesStore.categories" />
 </template>
 
 <script setup>
   import CategoryList from '../components/CategoryList.vue'
-  import { useStore } from '../stores/Store'
+  import { useCategoriesStore } from '../stores/CategoriesStore'
 
-  const store = useStore()
-
-  const categories = store.data.categories
+  const categoriesStore = useCategoriesStore()
 </script>
