@@ -1,7 +1,10 @@
 <template>
+  <TheNavigation />
   <div class="container">
     <RouterView></RouterView>
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+  import TheNavigation from './components/TheNavigation.vue'
+</script>

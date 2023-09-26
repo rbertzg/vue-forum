@@ -32,9 +32,7 @@
   const handleReply = (replyText) => {
     const post = {
       text: replyText,
-      publishedAt: Math.floor(Date.now() / 1000),
       threadId: props.id,
-      userId: 'ALXhxjwgY9PinwNGHpfai6OWyDu2',
     }
     postsStore.createPost(post)
   }
