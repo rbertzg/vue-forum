@@ -100,6 +100,7 @@
   import { useUsersStore } from '@/stores/UsersStore'
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
+
   const props = defineProps({
     user: { type: Object, required: true },
   })

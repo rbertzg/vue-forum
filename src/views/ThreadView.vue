@@ -1,6 +1,17 @@
 <template>
   <div class="col-large push-top">
     <h1>{{ thread.title }}</h1>
+    <RouterLink
+      :to="{
+        name: 'ThreadEdit',
+        params: {
+          id: thread.id,
+        },
+      }"
+      class="btn-small btn-green"
+    >
+      Edit
+    </RouterLink>
     <PostList :posts="threadPosts" />
     <PostReply
       :thread="thread"

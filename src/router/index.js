@@ -91,6 +91,18 @@ const routes = [
     },
   },
   {
+    path: '/thread/:id/edit',
+    name: 'ThreadEdit',
+    props: true,
+    component: () => import('@/views/ThreadEditView.vue'),
+  },
+  {
+    path: '/forum/:forumId/thread/create',
+    name: 'ThreadCreate',
+    props: true,
+    component: () => import('@/views/ThreadCreateView.vue'),
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: () => import('@/views/NotFoundView.vue'),

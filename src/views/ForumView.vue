@@ -5,10 +5,10 @@
         <h1>{{ forum.name }}</h1>
         <p class="text-lead">{{ forum.description }}</p>
       </div>
-      <a
-        href="#"
+      <RouterLink
+        :to="{ name: 'ThreadCreate', params: { forumId: forum.id } }"
         class="btn-green btn-small"
-        >New thread</a
+        >New thread</RouterLink
       >
     </div>
   </div>
@@ -24,7 +24,7 @@
   import { useThreadsStore } from '../stores/ThreadsStore'
 
   const props = defineProps({
-    id: { type: Number, required: true },
+    id: { type: String, required: true },
   })
 
   const forumsStore = useForumsStore()
