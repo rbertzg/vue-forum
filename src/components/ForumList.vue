@@ -17,6 +17,7 @@
 
 <script setup>
   import { computed } from 'vue'
+  import { findById } from '../helpers'
   import { useCategoriesStore } from '../stores/CategoriesStore'
   import { useForumsStore } from '../stores/ForumsStore'
   import ForumListItem from './ForumListItem.vue'
@@ -28,11 +29,9 @@
   const categoriesStore = useCategoriesStore()
   const forumsStore = useForumsStore()
 
-  const categoryName = computed(() => {
-    return categoriesStore.categories.find(
-      (category) => category.id === props.categoryId
-    ).name
-  })
+  const categoryName = computed(
+    () => findById(categoriesStore.categories, props.categoryId).name
+  )
 
   const categoryForums = computed(() => {
     return forumsStore.forums.filter(

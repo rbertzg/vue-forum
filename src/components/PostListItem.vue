@@ -4,12 +4,12 @@
       <a
         href="#"
         class="user-name"
-        >{{ getUserById(post.userId).name }}</a
+        >{{ user.name }}</a
       >
       <a href="#">
         <img
           class="avatar-large"
-          :src="getUserById(post.userId).avatar"
+          :src="user.avatar"
           alt=""
         />
       </a>
@@ -29,13 +29,15 @@
 </template>
 
 <script setup>
+  import { computed } from 'vue'
+  import { findById } from '../helpers'
   import { useUsersStore } from '../stores/UsersStore'
   import AppDate from './AppDate.vue'
 
-  defineProps({
+  const props = defineProps({
     post: { type: Object, required: true },
   })
 
   const usersStore = useUsersStore()
-  const getUserById = (id) => usersStore.users.find((user) => user.id === id)
+  const user = computed(() => findById(usersStore.users, props.post.userId))
 </script>

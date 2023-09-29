@@ -3,6 +3,7 @@ import { usePostsStore } from '@/stores/PostsStore'
 import { useThreadsStore } from '@/stores/ThreadsStore'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
+import { findById, upsert } from '../helpers'
 
 export const useUsersStore = defineStore('UsersStore', () => {
   const postsStore = usePostsStore()
@@ -11,9 +12,7 @@ export const useUsersStore = defineStore('UsersStore', () => {
   const users = ref(sourceData.users)
 
   const authUser = computed(() => {
-    const user = users.value.find(
-      (user) => user.id === 'VXjpr2WHa8Ux4Bnggym8QFLdv5C3'
-    )
+    const user = findById(users.value, 'VXjpr2WHa8Ux4Bnggym8QFLdv5C3')
     if (!user) return
 
     const posts = postsStore.posts.filter((post) => post.userId === user.id)
@@ -33,10 +32,7 @@ export const useUsersStore = defineStore('UsersStore', () => {
   })
 
   function updateUser(updatedUser) {
-    const userId = users.value.findIndex((user) => user.id === updatedUser.id)
-    if (userId > -1) {
-      users.value[userId] = updatedUser
-    }
+    upsert(users.value, updatedUser)
   }
 
   return { users, authUser, updateUser }

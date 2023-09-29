@@ -15,6 +15,7 @@
   import { useThreadsStore } from '@/stores/ThreadsStore'
   import { useRouter } from 'vue-router'
   import ThreadEditor from '../components/ThreadEditor.vue'
+  import { findById } from '../helpers'
 
   const props = defineProps({
     id: { type: String, required: true },
@@ -25,8 +26,8 @@
   const threadsStore = useThreadsStore()
   const postsStore = usePostsStore()
 
-  const thread = threadsStore.threads.find((thread) => thread.id === props.id)
-  const text = postsStore.posts.find((post) => post.id === thread.posts[0]).text
+  const thread = findById(threadsStore.threads, props.id)
+  const text = findById(postsStore.posts, thread.posts[0]).text
 
   function cancel() {
     router.push({ name: 'Thread', params: { id: props.id } })

@@ -4,6 +4,7 @@ import { usePostsStore } from '@/stores/PostsStore'
 import { useUsersStore } from '@/stores/UsersStore'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { findById, upsert } from '../helpers'
 
 export const useThreadsStore = defineStore('ThreadsStore', () => {
   const threads = ref(sourceData.threads)
@@ -27,14 +28,12 @@ export const useThreadsStore = defineStore('ThreadsStore', () => {
     postsStore.createPost(firstPost)
 
     // append thread to forum
-    const forum = forumsStore.forums.find(
-      (forum) => forum.id === thread.forumId
-    )
+    const forum = findById(forumsStore.forums, thread.forumId)
     forum.threads = forum.threads || []
     forum.threads.push(thread.id)
 
     // append thread to user
-    const user = usersStore.users.find((user) => user.id === thread.userId)
+    const user = findById(usersStore.users, thread.userId)
     user.threads = user.threads || []
     user.threads.push(thread.id)
 
@@ -43,11 +42,20 @@ export const useThreadsStore = defineStore('ThreadsStore', () => {
 
   async function updateThread(id, title, text) {
     const postsStore = usePostsStore()
-    const thread = threads.value.find((thread) => thread.id === id)
-    const post = postsStore.posts.find((post) => post.id === thread.posts[0])
 
-    thread.title = title
-    post.text = text
+    const thread = findById(threads.value, id)
+    const post = findById(postsStore.posts, thread.posts[0])
+
+    const updatedThread = {
+      ...thread,
+      title: title,
+    }
+    const updatedPost = {
+      ...post,
+      text: text,
+    }
+    upsert(threads.value, updatedThread)
+    upsert(postsStore.posts, updatedPost)
 
     return thread
   }

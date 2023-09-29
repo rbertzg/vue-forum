@@ -7,7 +7,7 @@
         </RouterLink>
       </p>
       <p class="text-faded text-xsmall">
-        By <a href="#">{{ getUserById(thread.userId).name }}</a
+        By <a href="#">{{ user.name }}</a
         >, <AppDate :timestamp="thread.publishedAt" />.
       </p>
     </div>
@@ -16,12 +16,12 @@
       <p class="replies-count">{{ thread.posts.length }} replies</p>
       <img
         class="avatar-medium"
-        :src="getUserById(thread.userId).avatar"
+        :src="user.avatar"
         alt=""
       />
       <div>
         <p class="text-xsmall">
-          <a href="#">{{ getUserById(thread.userId).name }}</a>
+          <a href="#">{{ user.name }}</a>
         </p>
         <p class="text-xsmall text-faded">
           <AppDate :timestamp="thread.publishedAt" />
@@ -32,13 +32,14 @@
 </template>
 
 <script setup>
+  import { findById } from '../helpers'
   import { useUsersStore } from '../stores/UsersStore'
   import AppDate from './AppDate.vue'
 
-  defineProps({
+  const props = defineProps({
     thread: { type: Object, required: true },
   })
 
   const usersStore = useUsersStore()
-  const getUserById = (id) => usersStore.users.find((user) => user.id === id)
+  const user = findById(usersStore.users, props.thread.userId)
 </script>

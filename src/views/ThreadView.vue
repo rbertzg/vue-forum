@@ -26,6 +26,7 @@
   import { computed } from 'vue'
   import PostList from '../components/PostList.vue'
   import PostReply from '../components/PostReply.vue'
+  import { findById } from '../helpers'
 
   const props = defineProps({
     id: { type: String, required: true },
@@ -33,9 +34,9 @@
 
   const threadsStore = useThreadsStore()
   const postsStore = usePostsStore()
-  const thread = computed(() =>
-    threadsStore.threads.find((thread) => thread.id === props.id)
-  )
+
+  const thread = findById(threadsStore.threads, props.id)
+
   const threadPosts = computed(() =>
     postsStore.posts.filter((post) => post.threadId === props.id)
   )

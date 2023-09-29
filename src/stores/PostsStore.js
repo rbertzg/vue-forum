@@ -3,6 +3,7 @@ import { useThreadsStore } from '@/stores/ThreadsStore'
 import { useUsersStore } from '@/stores/UsersStore'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { findById } from '../helpers'
 
 export const usePostsStore = defineStore('PostsStore', () => {
   const posts = ref(sourceData.posts)
@@ -10,9 +11,8 @@ export const usePostsStore = defineStore('PostsStore', () => {
   function createPost(post) {
     const usersStore = useUsersStore()
     const threadsStore = useThreadsStore()
-    const thread = threadsStore.threads.find(
-      (thread) => thread.id === post.threadId
-    )
+
+    const thread = findById(threadsStore.threads, post.threadId)
     post.id = 'post' + Math.random()
     post.userId = usersStore.authUser.id
     post.publishedAt = Math.floor(Date.now() / 1000)

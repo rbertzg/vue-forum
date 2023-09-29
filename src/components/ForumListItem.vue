@@ -12,7 +12,7 @@
     <div class="threads-count">
       <p>
         <span class="count">{{ forum.threads?.length }}</span>
-        {{ threadsCount(forum.threads) }}
+        {{ threadCountLabel }}
       </p>
     </div>
     <div class="last-thread"></div>
@@ -20,15 +20,17 @@
 </template>
 
 <script setup>
-  defineProps({
+  import { computed } from 'vue'
+
+  const props = defineProps({
     forum: { type: Object, required: true },
   })
 
-  const threadsCount = (threads) => {
-    if (threads) {
-      return threads.length > 1 ? 'threads' : 'thread'
+  const threadCountLabel = computed(() => {
+    if (props.forum.threads) {
+      return props.forum.threads.length > 1 ? 'threads' : 'thread'
     } else {
       return 'No threads'
     }
-  }
+  })
 </script>

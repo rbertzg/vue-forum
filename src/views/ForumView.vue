@@ -20,6 +20,7 @@
 <script setup>
   import ThreadList from '@/components/ThreadList.vue'
   import { computed } from 'vue'
+  import { findById } from '../helpers'
   import { useForumsStore } from '../stores/ForumsStore'
   import { useThreadsStore } from '../stores/ThreadsStore'
 
@@ -29,9 +30,8 @@
 
   const forumsStore = useForumsStore()
   const threadsStore = useThreadsStore()
-  const forum = computed(() =>
-    forumsStore.forums.find((forum) => forum.id === props.id)
-  )
+
+  const forum = computed(() => findById(forumsStore.forums, props.id))
   const threads = computed(() =>
     threadsStore.threads.filter((thread) => thread.forumId === props.id)
   )

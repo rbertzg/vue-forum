@@ -3,6 +3,7 @@ import { useForumsStore } from '@/stores/ForumsStore'
 import { useThreadsStore } from '@/stores/ThreadsStore'
 import HomeView from '@/views/HomeView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
+import { findById } from '../helpers'
 
 const routes = [
   {
@@ -29,9 +30,7 @@ const routes = [
     component: () => import('@/views/CategoryView.vue'),
     beforeEnter: (to) => {
       const categoriesStore = useCategoriesStore()
-      const categoryExists = categoriesStore.categories.find(
-        (category) => category.id === to.params.id
-      )
+      const categoryExists = findById(categoriesStore.categories, to.params.id)
       if (!categoryExists) {
         return {
           name: 'NotFound',
@@ -51,9 +50,7 @@ const routes = [
     component: () => import('@/views/ForumView.vue'),
     beforeEnter: (to) => {
       const forumsStore = useForumsStore()
-      const forumExists = forumsStore.forums.find(
-        (forum) => forum.id === to.params.id
-      )
+      const forumExists = findById(forumsStore.forums, to.params.id)
       if (!forumExists) {
         return {
           name: 'NotFound',
@@ -73,9 +70,8 @@ const routes = [
     component: () => import('@/views/ThreadView.vue'),
     beforeEnter: (to) => {
       const threadsStore = useThreadsStore()
-      const threadExists = threadsStore.threads.find(
-        (thread) => thread.id === to.params.id
-      )
+      const threadExists = findById(threadsStore.threads, to.params.id)
+
       if (!threadExists) {
         return {
           name: 'NotFound',
