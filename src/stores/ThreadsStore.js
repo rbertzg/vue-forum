@@ -3,11 +3,31 @@ import { useForumsStore } from '@/stores/ForumsStore'
 import { usePostsStore } from '@/stores/PostsStore'
 import { useUsersStore } from '@/stores/UsersStore'
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { findById, upsert } from '../helpers'
 
 export const useThreadsStore = defineStore('ThreadsStore', () => {
+  const usersStore = useUsersStore()
+
   const threads = ref(sourceData.threads)
+
+  // it is not cached
+  const thread = computed(() => {
+    return (id) => {
+      const thread = findById(threads.value, id)
+      return {
+        ...thread,
+        get author() {
+          return findById(usersStore.users, thread.userId)
+        },
+        get repliesCount() {
+          return thread.posts?.length - 1 || 0
+        },
+        // imo mniej czytelniej
+        contributorsCount: thread.contributors?.length || 0,
+      }
+    }
+  })
 
   async function createThread(thread, text) {
     const postsStore = usePostsStore()
@@ -18,6 +38,11 @@ export const useThreadsStore = defineStore('ThreadsStore', () => {
     thread.userId = usersStore.authUser.id
     thread.publishedAt = Math.floor(Date.now() / 1000)
     thread.posts = []
+    thread.contributors = []
+    const authUserId = usersStore.authUser.id
+    if (!thread.contributors.includes(authUserId)) {
+      thread.contributors.push(authUserId)
+    }
     threads.value.push(thread)
 
     // append post to thread
@@ -39,7 +64,6 @@ export const useThreadsStore = defineStore('ThreadsStore', () => {
 
     return thread
   }
-
   async function updateThread(id, title, text) {
     const postsStore = usePostsStore()
 
@@ -60,5 +84,5 @@ export const useThreadsStore = defineStore('ThreadsStore', () => {
     return thread
   }
 
-  return { threads, createThread, updateThread }
+  return { threads, thread, createThread, updateThread }
 })

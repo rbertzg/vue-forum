@@ -13,7 +13,8 @@
           alt=""
         />
       </a>
-      <p class="desktop-only text-small">107 posts</p>
+      <p class="desktop-only text-small">{{ user.postsCount }} posts</p>
+      <p class="desktop-only text-small">{{ user.threadsCount }} threads</p>
     </div>
     <div class="post-content">
       <div>
@@ -30,7 +31,6 @@
 
 <script setup>
   import { computed } from 'vue'
-  import { findById } from '../helpers'
   import { useUsersStore } from '../stores/UsersStore'
   import AppDate from './AppDate.vue'
 
@@ -39,5 +39,5 @@
   })
 
   const usersStore = useUsersStore()
-  const user = computed(() => findById(usersStore.users, props.post.userId))
+  const user = computed(() => usersStore.user(props.post.userId))
 </script>
