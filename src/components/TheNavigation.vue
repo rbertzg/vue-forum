@@ -16,7 +16,10 @@
     </div>
     <nav class="navbar">
       <ul>
-        <li class="navbar-user">
+        <li
+          v-if="usersStore.authUser"
+          class="navbar-user"
+        >
           <RouterLink :to="{ name: 'Profile' }">
             <img
               class="avatar-small"

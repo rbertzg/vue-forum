@@ -1,15 +1,15 @@
-import sourceData from '@/data.json'
 import { usePostsStore } from '@/stores/PostsStore'
 import { useThreadsStore } from '@/stores/ThreadsStore'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { findById, upsert } from '../helpers'
+import { fetchItem, fetchItems } from '../api'
+import { findById } from '../helpers'
 
 export const useUsersStore = defineStore('UsersStore', () => {
   const postsStore = usePostsStore()
   const threadsStore = useThreadsStore()
 
-  const users = ref(sourceData.users)
+  const users = ref([])
   const authId = ref('VXjpr2WHa8Ux4Bnggym8QFLdv5C3')
 
   const user = computed(() => {
@@ -36,9 +36,13 @@ export const useUsersStore = defineStore('UsersStore', () => {
 
   const authUser = computed(() => user.value(authId.value))
 
-  function updateUser(updatedUser) {
-    upsert(users.value, updatedUser)
+  async function fetchUser(id) {
+    return await fetchItem('users', id, users.value)
   }
 
-  return { users, user, authUser, updateUser }
+  async function fetchUsers(ids) {
+    return await fetchItems('users', ids, users.value)
+  }
+
+  return { users, user, authUser, fetchUser, fetchUsers }
 })

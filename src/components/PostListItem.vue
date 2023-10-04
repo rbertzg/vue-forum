@@ -1,6 +1,9 @@
 <template>
   <div class="post">
-    <div class="user-info">
+    <div
+      v-if="user"
+      class="user-info"
+    >
       <a
         href="#"
         class="user-name"

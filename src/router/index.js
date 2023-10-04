@@ -1,9 +1,5 @@
-import { useCategoriesStore } from '@/stores/CategoriesStore'
-import { useForumsStore } from '@/stores/ForumsStore'
-import { useThreadsStore } from '@/stores/ThreadsStore'
 import HomeView from '@/views/HomeView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
-import { findById } from '../helpers'
 
 const routes = [
   {
@@ -28,63 +24,63 @@ const routes = [
     name: 'Category',
     props: true,
     component: () => import('@/views/CategoryView.vue'),
-    beforeEnter: (to) => {
-      const categoriesStore = useCategoriesStore()
-      const categoryExists = findById(categoriesStore.categories, to.params.id)
-      if (!categoryExists) {
-        return {
-          name: 'NotFound',
-          params: {
-            pathMatch: to.path.substring(1).split('/'),
-          },
-          query: to.query,
-          hash: to.hash,
-        }
-      }
-    },
+    // beforeEnter: (to) => {
+    //   const categoriesStore = useCategoriesStore()
+    //   const categoryExists = findById(categoriesStore.categories, to.params.id)
+    //   if (!categoryExists) {
+    //     return {
+    //       name: 'NotFound',
+    //       params: {
+    //         pathMatch: to.path.substring(1).split('/'),
+    //       },
+    //       query: to.query,
+    //       hash: to.hash,
+    //     }
+    //   }
+    // },
   },
   {
     path: '/forum/:id',
     name: 'Forum',
     props: true,
     component: () => import('@/views/ForumView.vue'),
-    beforeEnter: (to) => {
-      const forumsStore = useForumsStore()
-      const forumExists = findById(forumsStore.forums, to.params.id)
-      if (!forumExists) {
-        return {
-          name: 'NotFound',
-          params: {
-            pathMatch: to.path.substring(1).split('/'),
-          },
-          query: to.query,
-          hash: to.hash,
-        }
-      }
-    },
+    // beforeEnter: (to) => {
+    //   const forumsStore = useForumsStore()
+    //   const forumExists = findById(forumsStore.forums, to.params.id)
+    //   if (!forumExists) {
+    //     return {
+    //       name: 'NotFound',
+    //       params: {
+    //         pathMatch: to.path.substring(1).split('/'),
+    //       },
+    //       query: to.query,
+    //       hash: to.hash,
+    //     }
+    //   }
+    // },
   },
   {
     path: '/thread/:id',
     name: 'Thread',
     props: true,
     component: () => import('@/views/ThreadView.vue'),
-    beforeEnter: (to) => {
-      const threadsStore = useThreadsStore()
-      const threadExists = findById(threadsStore.threads, to.params.id)
+    // beforeEnter: (to) => {
+    //   const threadsStore = useThreadsStore()
+    //   const threadExists = findById(threadsStore.threads, to.params.id)
 
-      if (!threadExists) {
-        return {
-          name: 'NotFound',
-          // preserve current path and remove the first char to avoid the target URL starting with `//`
-          params: {
-            pathMatch: to.path.substring(1).split('/'),
-          },
-          // preserve existing query and hash
-          query: to.query,
-          hash: to.hash,
-        }
-      }
-    },
+    //   if (!threadExists) {
+    //     return {
+    //       name: 'NotFound',
+    //       // preserve current path and remove the first char to avoid the target URL starting with `//`
+    //       params: {
+    //         pathMatch: to.path.substring(1).split('/'),
+    //       },
+    //       // preserve existing query and hash
+    //       query: to.query,
+    //       hash: to.hash,
+    //     }
+    //   }
+    // },
   },
   {
     path: '/thread/:id/edit',

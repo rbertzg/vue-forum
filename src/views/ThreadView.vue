@@ -1,5 +1,8 @@
 <template>
-  <div class="col-large push-top">
+  <div
+    v-if="thread"
+    class="col-large push-top"
+  >
     <h1>{{ thread.title }}</h1>
     <RouterLink
       :to="{
@@ -17,17 +20,17 @@
       <a
         href="#"
         class="link-unstyled"
-        >{{ thread.author.name }}</a
+        >{{ author?.name }}</a
       >, <AppDate :timestamp="thread.publishedAt" />.
       <span
-        v-if="thread.repliesCount > 0"
+        v-if="repliesCount > 1"
         style="float: right; margin-top: 2px"
         class="hide-mobile text-faded text-small"
-        >{{ thread.repliesCount }} replies by
-        {{ thread.contributorsCount }} contributors</span
+        >{{ repliesCount }} replies by
+        {{ contributorsCount }} contributors</span
       >
     </p>
-    <PostList :posts="threadPosts" />
+    <PostList :posts="posts" />
     <PostReply
       :thread="thread"
       @reply="handleReply"
@@ -36,24 +39,39 @@
 </template>
 
 <script setup>
-  import { usePostsStore } from '@/stores/PostsStore'
   import { useThreadsStore } from '@/stores/ThreadsStore'
-  import { computed } from 'vue'
+  import { computed, onMounted, ref } from 'vue'
   import AppDate from '../components/AppDate.vue'
   import PostList from '../components/PostList.vue'
   import PostReply from '../components/PostReply.vue'
+  import { findById } from '../helpers'
+  import { usePostsStore } from '../stores/PostsStore'
+  import { useUsersStore } from '../stores/UsersStore'
 
   const props = defineProps({
     id: { type: String, required: true },
   })
 
   const threadsStore = useThreadsStore()
+  const { fetchThread } = threadsStore
+
   const postsStore = usePostsStore()
+  const { fetchPosts } = postsStore
 
-  const thread = threadsStore.thread(props.id)
+  const usersStore = useUsersStore()
+  const { fetchUsers } = usersStore
 
-  const threadPosts = computed(() =>
-    postsStore.posts.filter((post) => post.threadId === props.id)
+  const thread = ref({})
+
+  const posts = computed(() =>
+    postsStore.posts.filter((post) => post.threadId === thread.value.id)
+  )
+  const author = computed(() => findById(usersStore.users, thread.value.userId))
+
+  const repliesCount = computed(() => thread.value.posts?.length - 1 || 0)
+
+  const contributorsCount = computed(
+    () => thread.value.contributors?.length || 0
   )
 
   const handleReply = (replyText) => {
@@ -63,4 +81,12 @@
     }
     postsStore.createPost(post)
   }
+
+  onMounted(async () => {
+    const fetchedThread = await fetchThread(props.id)
+    thread.value = fetchedThread
+    const posts = await fetchPosts(fetchedThread.posts)
+    const userIds = posts.map((post) => post.userId)
+    fetchUsers(userIds)
+  })
 </script>

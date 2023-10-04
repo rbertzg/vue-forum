@@ -1,12 +1,12 @@
-import sourceData from '@/data.json'
 import { useThreadsStore } from '@/stores/ThreadsStore'
 import { useUsersStore } from '@/stores/UsersStore'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { fetchItem, fetchItems } from '../api'
 import { findById } from '../helpers'
 
 export const usePostsStore = defineStore('PostsStore', () => {
-  const posts = ref(sourceData.posts)
+  const posts = ref([])
 
   function createPost(post) {
     const usersStore = useUsersStore()
@@ -14,12 +14,20 @@ export const usePostsStore = defineStore('PostsStore', () => {
 
     const thread = findById(threadsStore.threads, post.threadId)
     post.id = 'post' + Math.random()
-    post.userId = usersStore.authUser.id
+    post.userId = usersStore.authId
     post.publishedAt = Math.floor(Date.now() / 1000)
 
     posts.value.push(post)
     thread.posts.push(post.id)
   }
 
-  return { posts, createPost }
+  async function fetchPost(id) {
+    return await fetchItem('posts', id, posts.value)
+  }
+
+  async function fetchPosts(ids) {
+    return await fetchItems('posts', ids, posts.value)
+  }
+
+  return { posts, createPost, fetchPost, fetchPosts }
 })
