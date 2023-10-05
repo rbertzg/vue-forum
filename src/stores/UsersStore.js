@@ -2,8 +2,8 @@ import { usePostsStore } from '@/stores/PostsStore'
 import { useThreadsStore } from '@/stores/ThreadsStore'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { fetchItem, fetchItems } from '../api'
-import { findById } from '../helpers'
+import { fetchAllItems, fetchItem, fetchItems } from '../api'
+import { findById, upsert } from '../helpers'
 
 export const useUsersStore = defineStore('UsersStore', () => {
   const postsStore = usePostsStore()
@@ -34,7 +34,11 @@ export const useUsersStore = defineStore('UsersStore', () => {
     }
   })
 
-  const authUser = computed(() => user.value(authId.value))
+  const authUser = computed(() => findById(users.value, authId.value))
+
+  function setUser(user) {
+    upsert(users.value, user)
+  }
 
   async function fetchUser(id) {
     return await fetchItem('users', id, users.value)
@@ -44,5 +48,17 @@ export const useUsersStore = defineStore('UsersStore', () => {
     return await fetchItems('users', ids, users.value)
   }
 
-  return { users, user, authUser, fetchUser, fetchUsers }
+  async function fetchAllUsers() {
+    return await fetchAllItems('users', users.value)
+  }
+
+  return {
+    users,
+    user,
+    authUser,
+    setUser,
+    fetchUser,
+    fetchUsers,
+    fetchAllUsers,
+  }
 })

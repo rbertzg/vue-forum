@@ -1,10 +1,10 @@
 <template>
   <h1 class="push-top">Welcome to the Forum</h1>
-  <CategoryList :categories="categoriesStore.categories" />
+  <CategoryList :categories="categories" />
 </template>
 
 <script setup>
-  import { onBeforeMount } from 'vue'
+  import { onBeforeMount, ref } from 'vue'
   import CategoryList from '../components/CategoryList.vue'
   import { useCategoriesStore } from '../stores/CategoriesStore'
   import { useForumsStore } from '../stores/ForumsStore'
@@ -13,9 +13,12 @@
   const forumsStore = useForumsStore()
   const { fetchForums } = forumsStore
 
+  const categories = ref([])
+
   onBeforeMount(async () => {
-    const categories = await categoriesStore.fetchAllCategories()
-    const forumIds = categories.map((c) => c.forums).flat()
+    const fetchedCategories = await categoriesStore.fetchAllCategories()
+    categories.value = fetchedCategories
+    const forumIds = fetchedCategories.map((c) => c.forums).flat()
     fetchForums(forumIds)
   })
 </script>

@@ -4,10 +4,10 @@
       <RouterLink
         :to="{ name: 'Category', params: { id: categoryId } }"
         class="list-title"
-        >{{ categoryName }}
+        >{{ category.name }}
       </RouterLink>
       <ForumListItem
-        v-for="forum in categoryForums"
+        v-for="forum in forums"
         :key="forum.id"
         :forum="forum"
       />
@@ -16,7 +16,7 @@
 </template>
 
 <script setup>
-  import { computed } from 'vue'
+  import { computed, onMounted } from 'vue'
   import { findById } from '../helpers'
   import { useCategoriesStore } from '../stores/CategoriesStore'
   import { useForumsStore } from '../stores/ForumsStore'
@@ -27,15 +27,27 @@
   })
 
   const categoriesStore = useCategoriesStore()
-  const forumsStore = useForumsStore()
+  const { fetchCategory } = categoriesStore
 
-  const categoryName = computed(
-    () => findById(categoriesStore.categories, props.categoryId).name
+  const forumsStore = useForumsStore()
+  const { fetchForums } = forumsStore
+
+  const category = computed(
+    () => findById(categoriesStore.categories, props.categoryId) || {}
   )
 
-  const categoryForums = computed(() => {
-    return forumsStore.forums.filter(
-      (forum) => forum.categoryId === props.categoryId
+  const forums = computed(() =>
+    forumsStore.forums.filter((forum) => forum.categoryId === props.categoryId)
+  )
+
+  onMounted(async () => {
+    const categoryExists = categoriesStore.categories.some(
+      (category) => category.id === props.categoryId
     )
+
+    if (!categoryExists) {
+      const category = await fetchCategory(props.categoryId)
+      fetchForums(category.forums)
+    }
   })
 </script>

@@ -1,5 +1,8 @@
 <template>
-  <div class="col-full push-top">
+  <div
+    v-if="forum"
+    class="col-full push-top"
+  >
     <h1>
       Create new thread in <i>{{ forum.name }}</i>
     </h1>
@@ -12,7 +15,7 @@
 
 <script setup>
   import { useThreadsStore } from '@/stores/ThreadsStore'
-  import { computed } from 'vue'
+  import { computed, onMounted } from 'vue'
   import { useRouter } from 'vue-router'
   import ThreadEditor from '../components/ThreadEditor.vue'
   import { findById } from '../helpers'
@@ -23,8 +26,11 @@
   })
 
   const router = useRouter()
+
   const threadsStore = useThreadsStore()
+
   const forumsStore = useForumsStore()
+  const { fetchForum } = forumsStore
 
   const forum = computed(() => findById(forumsStore.forums, props.forumId))
 
@@ -39,4 +45,8 @@
     )
     router.push({ name: 'Thread', params: { id: thread.id } })
   }
+
+  onMounted(() => {
+    fetchForum(props.forumId)
+  })
 </script>

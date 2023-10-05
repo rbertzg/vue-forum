@@ -2,7 +2,7 @@ import { useThreadsStore } from '@/stores/ThreadsStore'
 import { useUsersStore } from '@/stores/UsersStore'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { fetchItem, fetchItems } from '../api'
+import { fetchAllItems, fetchItem, fetchItems } from '../api'
 import { findById } from '../helpers'
 
 export const usePostsStore = defineStore('PostsStore', () => {
@@ -29,5 +29,9 @@ export const usePostsStore = defineStore('PostsStore', () => {
     return await fetchItems('posts', ids, posts.value)
   }
 
-  return { posts, createPost, fetchPost, fetchPosts }
+  async function fetchAllPosts() {
+    return await fetchAllItems('posts', posts.value)
+  }
+
+  return { posts, createPost, fetchPost, fetchPosts, fetchAllPosts }
 })

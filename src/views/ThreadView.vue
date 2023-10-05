@@ -40,7 +40,7 @@
 
 <script setup>
   import { useThreadsStore } from '@/stores/ThreadsStore'
-  import { computed, onMounted, ref } from 'vue'
+  import { computed, onMounted } from 'vue'
   import AppDate from '../components/AppDate.vue'
   import PostList from '../components/PostList.vue'
   import PostReply from '../components/PostReply.vue'
@@ -61,7 +61,7 @@
   const usersStore = useUsersStore()
   const { fetchUsers } = usersStore
 
-  const thread = ref({})
+  const thread = computed(() => findById(threadsStore.threads, props.id))
 
   const posts = computed(() =>
     postsStore.posts.filter((post) => post.threadId === thread.value.id)
@@ -84,7 +84,6 @@
 
   onMounted(async () => {
     const fetchedThread = await fetchThread(props.id)
-    thread.value = fetchedThread
     const posts = await fetchPosts(fetchedThread.posts)
     const userIds = posts.map((post) => post.userId)
     fetchUsers(userIds)

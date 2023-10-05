@@ -3,7 +3,7 @@ import { usePostsStore } from '@/stores/PostsStore'
 import { useUsersStore } from '@/stores/UsersStore'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { fetchItem, fetchItems } from '../api'
+import { fetchAllItems, fetchItem, fetchItems } from '../api'
 import { findById, upsert } from '../helpers'
 
 export const useThreadsStore = defineStore('ThreadsStore', () => {
@@ -14,7 +14,7 @@ export const useThreadsStore = defineStore('ThreadsStore', () => {
   const thread = computed(() => {
     return (id) => {
       const thread = findById(threads.value, id)
-      if (!thread) return null
+      if (!thread) return {}
       return {
         ...thread,
         get author() {
@@ -35,12 +35,13 @@ export const useThreadsStore = defineStore('ThreadsStore', () => {
     const usersStore = useUsersStore()
     const forumsStore = useForumsStore()
 
+    const authUserId = usersStore.authUser?.id
+
     thread.id = 'thread' + Math.random()
-    thread.userId = usersStore.authUser.id
+    thread.userId = authUserId
     thread.publishedAt = Math.floor(Date.now() / 1000)
     thread.posts = []
     thread.contributors = []
-    const authUserId = usersStore.authUser.id
     if (!thread.contributors.includes(authUserId)) {
       thread.contributors.push(authUserId)
     }
@@ -60,11 +61,14 @@ export const useThreadsStore = defineStore('ThreadsStore', () => {
 
     // append thread to user
     const user = findById(usersStore.users, thread.userId)
-    user.threads = user.threads || []
-    user.threads.push(thread.id)
+    if (user) {
+      user.threads = user.threads || []
+      user.threads.push(thread.id)
+    }
 
     return thread
   }
+
   async function updateThread(id, title, text) {
     const postsStore = usePostsStore()
 
@@ -93,6 +97,10 @@ export const useThreadsStore = defineStore('ThreadsStore', () => {
     return await fetchItems('threads', ids, threads.value)
   }
 
+  async function fetchAllThreads() {
+    return await fetchAllItems('threads', threads.value)
+  }
+
   return {
     threads,
     thread,
@@ -100,5 +108,6 @@ export const useThreadsStore = defineStore('ThreadsStore', () => {
     updateThread,
     fetchThread,
     fetchThreads,
+    fetchAllThreads,
   }
 })

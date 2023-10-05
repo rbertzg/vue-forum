@@ -1,5 +1,8 @@
 <template>
-  <div class="col-full push-top">
+  <div
+    v-if="forum"
+    class="col-full push-top"
+  >
     <div class="forum-header">
       <div class="forum-details">
         <h1>{{ forum.name }}</h1>
@@ -12,31 +15,43 @@
       >
     </div>
   </div>
-  <div class="col-full push-top">
+  <div
+    v-if="threads"
+    class="col-full push-top"
+  >
     <ThreadList :threads="threads" />
   </div>
 </template>
 
 <script setup>
   import ThreadList from '@/components/ThreadList.vue'
-  import { computed } from 'vue'
-  import { findById } from '../helpers'
+  import { onMounted, ref } from 'vue'
   import { useForumsStore } from '../stores/ForumsStore'
   import { useThreadsStore } from '../stores/ThreadsStore'
+  import { useUsersStore } from '../stores/UsersStore'
 
   const props = defineProps({
     id: { type: String, required: true },
   })
 
   const forumsStore = useForumsStore()
-  const threadsStore = useThreadsStore()
+  const { fetchForum } = forumsStore
 
-  const forum = computed(() => findById(forumsStore.forums, props.id))
-  console.log(forum.value)
-  const threads = computed(() =>
-    forum.value.threads.map((threadId) => threadsStore.thread(threadId))
-  )
-  // const threads = computed(() =>
-  //   threadsStore.threads.filter((thread) => thread.forumId === props.id)
-  // )
+  const threadsStore = useThreadsStore()
+  const { fetchThreads } = threadsStore
+
+  const usersStore = useUsersStore()
+  const { fetchUsers } = usersStore
+
+  const forum = ref()
+  const threads = ref()
+
+  onMounted(async () => {
+    const fetchedForum = await fetchForum(props.id)
+    const fetchedThreads = await fetchThreads(fetchedForum.threads)
+    const userIds = fetchedThreads.map((thread) => thread.userId)
+    fetchUsers(userIds)
+    forum.value = fetchedForum
+    threads.value = fetchedThreads
+  })
 </script>

@@ -13,7 +13,7 @@
     </div>
 
     <div class="activity">
-      <p class="replies-count">{{ thread.repliesCount }} replies</p>
+      <p class="replies-count">{{ repliesCount }} replies</p>
       <img
         class="avatar-medium"
         :src="user.avatar"
@@ -32,6 +32,7 @@
 </template>
 
 <script setup>
+  import { computed } from 'vue'
   import { findById } from '../helpers'
   import { useUsersStore } from '../stores/UsersStore'
   import AppDate from './AppDate.vue'
@@ -41,5 +42,9 @@
   })
 
   const usersStore = useUsersStore()
-  const user = findById(usersStore.users, props.thread.userId)
+
+  const user = computed(
+    () => findById(usersStore.users, props.thread.userId) || {}
+  )
+  const repliesCount = computed(() => props.thread.posts?.length - 1 || 0)
 </script>

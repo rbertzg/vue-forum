@@ -115,7 +115,7 @@
   }
 
   function save() {
-    usersStore.setUser(activeUser.value)
+    usersStore.setUser(activeUser.value) 
     exit()
   }
 </script>
