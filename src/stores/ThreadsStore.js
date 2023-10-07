@@ -1,6 +1,15 @@
 import { useForumsStore } from '@/stores/ForumsStore'
 import { usePostsStore } from '@/stores/PostsStore'
 import { useUsersStore } from '@/stores/UsersStore'
+import {
+  arrayUnion,
+  collection,
+  doc,
+  getDoc,
+  getFirestore,
+  serverTimestamp,
+  writeBatch,
+} from 'firebase/firestore'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { fetchAllItems, fetchItem, fetchItems } from '../api'
@@ -8,6 +17,10 @@ import { findById, upsert } from '../helpers'
 
 export const useThreadsStore = defineStore('ThreadsStore', () => {
   const usersStore = useUsersStore()
+  const postsStore = usePostsStore()
+  const forumsStore = useForumsStore()
+  const db = getFirestore()
+
   const threads = ref([])
 
   // it is not cached
@@ -30,43 +43,62 @@ export const useThreadsStore = defineStore('ThreadsStore', () => {
     }
   })
 
-  async function createThread(thread, text) {
-    const postsStore = usePostsStore()
-    const usersStore = useUsersStore()
-    const forumsStore = useForumsStore()
+  async function createThread({ title, text, forumId }) {
+    const userId = usersStore.authId
+    const publishedAt = serverTimestamp()
+    // thread.value.posts = []
+    // thread.value.contributors = []
+    // if (!thread.value.contributors.includes(usersStore.authId)) {
+    //   thread.value.contributors.push(usersStore.authId)
+    // }
 
-    const authUserId = usersStore.authUser?.id
-
-    thread.id = 'thread' + Math.random()
-    thread.userId = authUserId
-    thread.publishedAt = Math.floor(Date.now() / 1000)
-    thread.posts = []
-    thread.contributors = []
-    if (!thread.contributors.includes(authUserId)) {
-      thread.contributors.push(authUserId)
+    const threadRef = doc(collection(db, 'threads'))
+    const thread = {
+      id: threadRef.id,
+      title,
+      forumId,
+      publishedAt,
+      userId,
     }
-    upsert(threads.value, thread)
+    const userRef = doc(db, 'users', userId)
+    const forumRef = doc(db, 'forums', forumId)
 
-    // append post to thread
-    const firstPost = {
-      text,
-      threadId: thread.id,
-    }
-    postsStore.createPost(firstPost)
+    await writeBatch(db)
+      .set(threadRef, thread)
+      .update(userRef, {
+        threads: arrayUnion(threadRef.id),
+      })
+      .update(forumRef, {
+        threads: arrayUnion(threadRef.id),
+      })
+      .commit()
 
-    // append thread to forum
-    const forum = findById(forumsStore.forums, thread.forumId)
-    forum.threads = forum.threads || []
-    forum.threads.push(thread.id)
+    const newThread = await getDoc(threadRef)
 
-    // append thread to user
-    const user = findById(usersStore.users, thread.userId)
+    upsert(threads.value, { ...newThread.data(), id: newThread.id })
+
+    // function upsertProperty(store, itemId, propertyName, newValue) {
+    //   const item = findById(store, itemId);
+    //   if (item) {
+    //     item[propertyName] = newValue;
+    //   }
+    // }
+
+    const user = findById(usersStore.users, newThread.userId)
     if (user) {
       user.threads = user.threads || []
-      user.threads.push(thread.id)
+      upsert(user.threads, newThread.id)
     }
 
-    return thread
+    const forum = findById(forumsStore.forums, newThread.forumId)
+    if (forum) {
+      forum.threads = forum.threads || []
+      upsert(forum.threads, newThread.id)
+    }
+
+    await postsStore.createPost({ text, threadId: newThread.id })
+
+    return findById(threads.value, newThread.id)
   }
 
   async function updateThread(id, title, text) {
@@ -89,17 +121,9 @@ export const useThreadsStore = defineStore('ThreadsStore', () => {
     return thread
   }
 
-  async function fetchThread(id) {
-    return await fetchItem('threads', id, threads.value)
-  }
-
-  async function fetchThreads(ids) {
-    return await fetchItems('threads', ids, threads.value)
-  }
-
-  async function fetchAllThreads() {
-    return await fetchAllItems('threads', threads.value)
-  }
+  const fetchThread = (id) => fetchItem('threads', id, threads.value)
+  const fetchThreads = (ids) => fetchItems('threads', ids, threads.value)
+  const fetchAllThreads = () => fetchAllItems('threads', threads.value)
 
   return {
     threads,

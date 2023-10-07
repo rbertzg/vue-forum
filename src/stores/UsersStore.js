@@ -18,11 +18,9 @@ export const useUsersStore = defineStore('UsersStore', () => {
       if (!user) return
 
       const posts = postsStore.posts.filter((post) => post.userId === user.id)
-      const postsCount = posts.length
-      const threads = threadsStore.threads.filter(
-        (thread) => thread.userId === user.id
-      )
-      const threadsCount = threads.length
+      const threads = threadsStore.threads.filter((thread) => thread.userId === user.id)
+      const postsCount = user.postsCount || 0
+      const threadsCount = user.threads?.length || 0
 
       return {
         ...user,
@@ -40,24 +38,19 @@ export const useUsersStore = defineStore('UsersStore', () => {
     upsert(users.value, user)
   }
 
-  async function fetchUser(id) {
-    return await fetchItem('users', id, users.value)
-  }
-
-  async function fetchUsers(ids) {
-    return await fetchItems('users', ids, users.value)
-  }
-
-  async function fetchAllUsers() {
-    return await fetchAllItems('users', users.value)
-  }
+  const fetchUser = (id) => fetchItem('users', id, users.value)
+  const fetchAuthUser = () => fetchItem('users', authId.value, users.value)
+  const fetchUsers = (ids) => fetchItems('users', ids, users.value)
+  const fetchAllUsers = () => fetchAllItems('users', users.value)
 
   return {
     users,
     user,
     authUser,
+    authId,
     setUser,
     fetchUser,
+    fetchAuthUser,
     fetchUsers,
     fetchAllUsers,
   }

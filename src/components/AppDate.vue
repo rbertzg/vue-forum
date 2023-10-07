@@ -14,13 +14,13 @@
   dayjs.extend(localizedDate)
 
   const props = defineProps({
-    timestamp: { type: Number, required: true },
+    timestamp: { type: [Number, Object], required: true },
   })
 
+  const normalizedTimestamp = computed(() => props.timestamp?.seconds || props.timestamp)
+
   // example: Thu, Aug 16, 2018 8:02 PM - depending on location
-  const readableDate = computed(() =>
-    dayjs.unix(props.timestamp).format('L LT')
-  )
+  const readableDate = computed(() => dayjs.unix(normalizedTimestamp.value).format('L LT'))
   // example: 3 years ago
-  const readableFromNow = computed(() => dayjs.unix(props.timestamp).fromNow())
+  const readableFromNow = computed(() => dayjs.unix(normalizedTimestamp.value).fromNow())
 </script>

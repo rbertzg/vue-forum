@@ -39,10 +39,7 @@
   }
 
   async function save({ title, text }) {
-    const thread = await threadsStore.createThread(
-      { title, forumId: props.forumId },
-      text
-    )
+    const thread = await threadsStore.createThread({ title, forumId: props.forumId, text })
     router.push({ name: 'Thread', params: { id: thread.id } })
   }
 
