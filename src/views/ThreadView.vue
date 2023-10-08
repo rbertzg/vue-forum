@@ -26,15 +26,11 @@
         v-if="repliesCount > 1"
         style="float: right; margin-top: 2px"
         class="hide-mobile text-faded text-small"
-        >{{ repliesCount }} replies by
-        {{ contributorsCount }} contributors</span
+        >{{ repliesCount }} replies by {{ contributorsCount }} contributors</span
       >
     </p>
     <PostList :posts="posts" />
-    <PostReply
-      :thread="thread"
-      @reply="handleReply"
-    />
+    <PostEditor @save="addPost" />
   </div>
 </template>
 
@@ -42,8 +38,8 @@
   import { useThreadsStore } from '@/stores/ThreadsStore'
   import { computed, onMounted } from 'vue'
   import AppDate from '../components/AppDate.vue'
+  import PostEditor from '../components/PostEditor.vue'
   import PostList from '../components/PostList.vue'
-  import PostReply from '../components/PostReply.vue'
   import { findById } from '../helpers'
   import { usePostsStore } from '../stores/PostsStore'
   import { useUsersStore } from '../stores/UsersStore'
@@ -63,18 +59,14 @@
 
   const thread = computed(() => findById(threadsStore.threads, props.id))
 
-  const posts = computed(() =>
-    postsStore.posts.filter((post) => post.threadId === thread.value.id)
-  )
+  const posts = computed(() => postsStore.posts.filter((post) => post.threadId === thread.value.id))
   const author = computed(() => findById(usersStore.users, thread.value.userId))
 
   const repliesCount = computed(() => thread.value.posts?.length - 1 || 0)
 
-  const contributorsCount = computed(
-    () => thread.value.contributors?.length || 0
-  )
+  const contributorsCount = computed(() => thread.value.contributors?.length || 0)
 
-  const handleReply = (replyText) => {
+  const addPost = (replyText) => {
     const post = {
       text: replyText,
       threadId: props.id,
