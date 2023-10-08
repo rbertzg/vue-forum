@@ -3,7 +3,7 @@ import { useThreadsStore } from '@/stores/ThreadsStore'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { fetchAllItems, fetchItem, fetchItems } from '../api'
-import { findById, upsert } from '../helpers'
+import { docToResource, findById, upsert } from '../helpers'
 
 export const useUsersStore = defineStore('UsersStore', () => {
   const postsStore = usePostsStore()
@@ -34,10 +34,7 @@ export const useUsersStore = defineStore('UsersStore', () => {
 
   const authUser = computed(() => findById(users.value, authId.value))
 
-  function setUser(user) {
-    upsert(users.value, user)
-  }
-
+  const setUser = (user) => upsert(users.value, docToResource(user))
   const fetchUser = (id) => fetchItem('users', id, users.value)
   const fetchAuthUser = () => fetchItem('users', authId.value, users.value)
   const fetchUsers = (ids) => fetchItems('users', ids, users.value)

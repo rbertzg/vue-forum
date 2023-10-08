@@ -13,7 +13,7 @@ import {
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { fetchAllItems, fetchItem, fetchItems } from '../api'
-import { findById, upsert } from '../helpers'
+import { docToResource, findById, upsert } from '../helpers'
 
 export const usePostsStore = defineStore('PostsStore', () => {
   const posts = ref([])
@@ -35,14 +35,14 @@ export const usePostsStore = defineStore('PostsStore', () => {
         posts: arrayUnion(postRef.id),
         contributors: arrayUnion(usersStore.authId),
       })
-      .update(userRef,{
-        postsCount: increment(1)
+      .update(userRef, {
+        postsCount: increment(1),
       })
       .commit()
 
     const newPost = await getDoc(postRef)
 
-    upsert(posts.value, { ...newPost.data(), id: newPost.id })
+    setPost(newPost)
     const thread = findById(threadsStore.threads, newPost.data().threadId)
     if (!thread) {
       return console.warn("thread doesn't exist")
@@ -55,9 +55,10 @@ export const usePostsStore = defineStore('PostsStore', () => {
     upsert(thread.contributors, usersStore.authId)
   }
 
+  const setPost = (post) => upsert(posts.value, docToResource(post))
   const fetchPost = (id) => fetchItem('posts', id, posts.value)
   const fetchPosts = (ids) => fetchItems('posts', ids, posts.value)
   const fetchAllPosts = () => fetchAllItems('posts', posts.value)
 
-  return { posts, createPost, fetchPost, fetchPosts, fetchAllPosts }
+  return { posts, setPost, createPost, fetchPost, fetchPosts, fetchAllPosts }
 })

@@ -13,7 +13,7 @@ import {
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { fetchAllItems, fetchItem, fetchItems } from '../api'
-import { findById, upsert } from '../helpers'
+import { docToResource, findById, upsert } from '../helpers'
 
 export const useThreadsStore = defineStore('ThreadsStore', () => {
   const usersStore = useUsersStore()
@@ -102,25 +102,33 @@ export const useThreadsStore = defineStore('ThreadsStore', () => {
   }
 
   async function updateThread(id, title, text) {
-    const postsStore = usePostsStore()
-
     const thread = findById(threads.value, id)
     const post = findById(postsStore.posts, thread.posts[0])
 
-    const updatedThread = {
-      ...thread,
-      title: title,
-    }
-    const updatedPost = {
-      ...post,
-      text: text,
-    }
-    upsert(threads.value, updatedThread)
-    upsert(postsStore.posts, updatedPost)
+    const threadRef = doc(db, 'threads', id)
+    const postRef = doc(db, 'posts', post.id)
 
-    return thread
+    let newThread = {
+      ...thread,
+      title,
+    }
+    let newPost = {
+      ...post,
+      text,
+    }
+
+    await writeBatch(db).update(threadRef, newThread).update(postRef, newPost).commit()
+
+    newThread = await getDoc(threadRef)
+    newPost = await getDoc(postRef)
+
+    setThread(newThread)
+    postsStore.setPost(newPost)
+
+    return docToResource(newThread)
   }
 
+  const setThread = (thread) => upsert(threads.value, docToResource(thread))
   const fetchThread = (id) => fetchItem('threads', id, threads.value)
   const fetchThreads = (ids) => fetchItems('threads', ids, threads.value)
   const fetchAllThreads = () => fetchAllItems('threads', threads.value)
@@ -128,6 +136,7 @@ export const useThreadsStore = defineStore('ThreadsStore', () => {
   return {
     threads,
     thread,
+    setThread,
     createThread,
     updateThread,
     fetchThread,
