@@ -21,10 +21,16 @@
     </div>
     <div class="post-content">
       <div>
-        <p>
-          {{ post.text }}
-        </p>
+        <p>{{ post.text }}</p>
       </div>
+      <a
+        href="#"
+        style="margin-left: auto; padding-left: 20px"
+        class="link-unstyled"
+        title="Make a change"
+      >
+        <FontAwesomeIcon icon="pencil" />
+      </a>
     </div>
     <div class="post-date text-faded">
       <AppDate :timestamp="post.publishedAt" />
@@ -33,6 +39,7 @@
 </template>
 
 <script setup>
+  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
   import { computed } from 'vue'
   import { useUsersStore } from '../stores/UsersStore'
   import AppDate from './AppDate.vue'
