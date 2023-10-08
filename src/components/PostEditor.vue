@@ -22,7 +22,7 @@
   import { ref } from 'vue'
 
   const props = defineProps({
-    post: { type: Object, default: () => ({ text: null }) },
+    post: { type: Object, default: () => ({ text: '' }) },
   })
 
   const emit = defineEmits(['save'])
@@ -30,6 +30,7 @@
   const postCopy = ref(props.post)
 
   const save = () => {
-    emit('save', { post: postCopy.value })
+    emit('save', postCopy.value)
+    postCopy.value.text = ''
   }
 </script>

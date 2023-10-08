@@ -8,6 +8,7 @@ import {
   getFirestore,
   increment,
   serverTimestamp,
+  updateDoc,
   writeBatch,
 } from 'firebase/firestore'
 import { defineStore } from 'pinia'
@@ -17,12 +18,27 @@ import { docToResource, findById, upsert } from '../helpers'
 
 export const usePostsStore = defineStore('PostsStore', () => {
   const posts = ref([])
+  const usersStore = useUsersStore()
+  const threadsStore = useThreadsStore()
+  const db = getFirestore()
+
+  async function updatePost({ text, id }) {
+    const post = {
+      text,
+      edited: {
+        at: serverTimestamp(),
+        by: usersStore.authId,
+        moderated: false,
+      },
+    }
+
+    const postRef = doc(db, 'posts', id)
+    await updateDoc(postRef, post)
+    const updatedPost = await getDoc(postRef)
+    setPost(updatedPost)
+  }
 
   async function createPost(post) {
-    const usersStore = useUsersStore()
-    const threadsStore = useThreadsStore()
-    const db = getFirestore()
-
     post.userId = usersStore.authId
     post.publishedAt = serverTimestamp()
 
@@ -60,5 +76,5 @@ export const usePostsStore = defineStore('PostsStore', () => {
   const fetchPosts = (ids) => fetchItems('posts', ids, posts.value)
   const fetchAllPosts = () => fetchAllItems('posts', posts.value)
 
-  return { posts, setPost, createPost, fetchPost, fetchPosts, fetchAllPosts }
+  return { posts, setPost, createPost, updatePost, fetchPost, fetchPosts, fetchAllPosts }
 })

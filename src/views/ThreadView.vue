@@ -66,9 +66,9 @@
 
   const contributorsCount = computed(() => thread.value.contributors?.length || 0)
 
-  const addPost = (replyText) => {
+  const addPost = ({ text }) => {
     const post = {
-      text: replyText,
+      text,
       threadId: props.id,
     }
     postsStore.createPost(post)
