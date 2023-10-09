@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="forum"
+    v-if="isReady"
     class="col-full push-top"
   >
     <h1>
@@ -11,11 +11,13 @@
       @save="save"
     />
   </div>
+  <div v-else-if="isLoading">Loading...</div>
 </template>
 
 <script setup>
   import { useThreadsStore } from '@/stores/ThreadsStore'
-  import { computed, onMounted } from 'vue'
+  import { useAsyncState } from '@vueuse/core'
+  import { computed } from 'vue'
   import { useRouter } from 'vue-router'
   import ThreadEditor from '../components/ThreadEditor.vue'
   import { findById } from '../helpers'
@@ -43,7 +45,7 @@
     router.push({ name: 'Thread', params: { id: thread.id } })
   }
 
-  onMounted(() => {
-    fetchForum(props.forumId)
+  const { isReady, isLoading } = useAsyncState(async () => {
+    await fetchForum(props.forumId)
   })
 </script>

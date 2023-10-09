@@ -1,9 +1,9 @@
 <template>
-  <CategoryListItem :categoryId="id" />
+  <ForumList :categoryId="id" />
 </template>
 
 <script setup>
-  import CategoryListItem from '../components/CategoryListItem.vue'
+  import ForumList from '../components/ForumList.vue'
 
   defineProps({
     id: { type: String, required: true },

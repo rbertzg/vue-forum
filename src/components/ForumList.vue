@@ -1,5 +1,8 @@
 <template>
-  <div class="col-full">
+  <div
+    v-if="isReady"
+    class="col-full"
+  >
     <div class="forum-list">
       <RouterLink
         :to="{ name: 'Category', params: { id: categoryId } }"
@@ -13,10 +16,12 @@
       />
     </div>
   </div>
+  <div v-else-if="isLoading">Loading...</div>
 </template>
 
 <script setup>
-  import { computed, onMounted } from 'vue'
+  import { useAsyncState } from '@vueuse/core'
+  import { computed } from 'vue'
   import { findById } from '../helpers'
   import { useCategoriesStore } from '../stores/CategoriesStore'
   import { useForumsStore } from '../stores/ForumsStore'
@@ -32,15 +37,13 @@
   const forumsStore = useForumsStore()
   const { fetchForums } = forumsStore
 
-  const category = computed(
-    () => findById(categoriesStore.categories, props.categoryId) || {}
-  )
+  const category = computed(() => findById(categoriesStore.categories, props.categoryId) || {})
 
   const forums = computed(() =>
     forumsStore.forums.filter((forum) => forum.categoryId === props.categoryId)
   )
 
-  onMounted(async () => {
+  const { isReady, isLoading } = useAsyncState(async () => {
     const categoryExists = categoriesStore.categories.some(
       (category) => category.id === props.categoryId
     )

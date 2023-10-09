@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="thread"
+    v-if="isReady"
     class="col-large push-top"
   >
     <h1>{{ thread.title }}</h1>
@@ -32,11 +32,13 @@
     <PostList :posts="posts" />
     <PostEditor @save="addPost" />
   </div>
+  <div v-else-if="isLoading">Loading...</div>
 </template>
 
 <script setup>
   import { useThreadsStore } from '@/stores/ThreadsStore'
-  import { computed, onMounted } from 'vue'
+  import { useAsyncState } from '@vueuse/core'
+  import { computed } from 'vue'
   import AppDate from '../components/AppDate.vue'
   import PostEditor from '../components/PostEditor.vue'
   import PostList from '../components/PostList.vue'
@@ -74,10 +76,10 @@
     postsStore.createPost(post)
   }
 
-  onMounted(async () => {
+  const { isReady, isLoading } = useAsyncState(async () => {
     const fetchedThread = await fetchThread(props.id)
     const posts = await fetchPosts(fetchedThread.posts)
     const userIds = posts.map((post) => post.userId)
-    fetchUsers(userIds)
+    await fetchUsers(userIds)
   })
 </script>
