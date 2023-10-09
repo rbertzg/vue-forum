@@ -1,5 +1,6 @@
 import HomeView from '@/views/HomeView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
+import { useUnsubscribesStore } from '../stores/UnsubscribesStore'
 
 const routes = [
   {
@@ -110,6 +111,11 @@ const router = createRouter({
     if (to.meta.smoothScroll) scroll.behavior = 'smooth'
     return scroll
   },
+})
+
+router.beforeEach(() => {
+  const unsubscribesStore = useUnsubscribesStore()
+  unsubscribesStore.unsubscribeAllSnapshots()
 })
 
 export default router
