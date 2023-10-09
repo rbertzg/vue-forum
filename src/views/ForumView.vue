@@ -1,8 +1,5 @@
 <template>
-  <div
-    v-if="isReady"
-    class="col-full push-top"
-  >
+  <div class="col-full push-top">
     <div>
       <div class="forum-header">
         <div class="forum-details">
@@ -20,12 +17,10 @@
       <ThreadList :threads="threads" />
     </div>
   </div>
-  <div v-else-if="isLoading">Loading...</div>
 </template>
 
 <script setup>
   import ThreadList from '@/components/ThreadList.vue'
-  import { useAsyncState } from '@vueuse/core'
   import { ref } from 'vue'
   import { useForumsStore } from '../stores/ForumsStore'
   import { useThreadsStore } from '../stores/ThreadsStore'
@@ -47,12 +42,10 @@
   const forum = ref()
   const threads = ref()
 
-  const { isReady, isLoading } = useAsyncState(async () => {
-    const fetchedForum = await fetchForum(props.id)
-    const fetchedThreads = await fetchThreads(fetchedForum.threads)
-    const userIds = fetchedThreads.map((thread) => thread.userId)
-    await fetchUsers(userIds)
-    forum.value = fetchedForum
-    threads.value = fetchedThreads
-  })
+  const fetchedForum = await fetchForum(props.id)
+  const fetchedThreads = await fetchThreads(fetchedForum.threads)
+  const userIds = fetchedThreads.map((thread) => thread.userId)
+  await fetchUsers(userIds)
+  forum.value = fetchedForum
+  threads.value = fetchedThreads
 </script>

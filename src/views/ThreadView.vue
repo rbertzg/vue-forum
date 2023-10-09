@@ -1,8 +1,5 @@
 <template>
-  <div
-    v-if="isReady"
-    class="col-large push-top"
-  >
+  <div class="col-large push-top">
     <h1>{{ thread.title }}</h1>
     <RouterLink
       :to="{
@@ -32,12 +29,10 @@
     <PostList :posts="posts" />
     <PostEditor @save="addPost" />
   </div>
-  <div v-else-if="isLoading">Loading...</div>
 </template>
 
 <script setup>
   import { useThreadsStore } from '@/stores/ThreadsStore'
-  import { useAsyncState } from '@vueuse/core'
   import { computed } from 'vue'
   import AppDate from '../components/AppDate.vue'
   import PostEditor from '../components/PostEditor.vue'
@@ -76,10 +71,8 @@
     postsStore.createPost(post)
   }
 
-  const { isReady, isLoading } = useAsyncState(async () => {
-    const fetchedThread = await fetchThread(props.id)
-    const posts = await fetchPosts(fetchedThread.posts)
-    const userIds = posts.map((post) => post.userId)
-    await fetchUsers(userIds)
-  })
+  const fetchedThread = await fetchThread(props.id)
+  const fetchedPosts = await fetchPosts(fetchedThread.posts)
+  const userIds = fetchedPosts.map((post) => post.userId)
+  await fetchUsers(userIds)
 </script>

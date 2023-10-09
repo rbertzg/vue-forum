@@ -1,7 +1,14 @@
 <template>
   <TheNavigation />
   <div class="container">
-    <RouterView></RouterView>
+    <RouterView v-slot="{ Component }">
+      <template v-if="Component">
+        <Suspense>
+          <component :is="Component"></component>
+          <template #fallback> data... </template>
+        </Suspense>
+      </template>
+    </RouterView>
   </div>
 </template>
 

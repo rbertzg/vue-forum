@@ -32,7 +32,7 @@ export const useUsersStore = defineStore('UsersStore', () => {
     }
   })
 
-  const authUser = computed(() => findById(users.value, authId.value))
+  const authUser = computed(() => findById(users.value, authId.value) || {})
 
   const setUser = (user) => upsert(users.value, docToResource(user))
   const fetchUser = (id) => fetchItem('users', id, users.value)

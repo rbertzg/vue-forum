@@ -1,8 +1,5 @@
 <template>
-  <div
-    v-if="isReady"
-    class="col-full push-top"
-  >
+  <div class="col-full push-top">
     <h1>Editing {{ thread.title }}</h1>
     <ThreadEditor
       :title="thread.title"
@@ -11,13 +8,11 @@
       @save="save"
     />
   </div>
-  <div v-else-if="isLoading">Loading...</div>
 </template>
 
 <script setup>
   import { usePostsStore } from '@/stores/PostsStore'
   import { useThreadsStore } from '@/stores/ThreadsStore'
-  import { useAsyncState } from '@vueuse/core'
   import { computed } from 'vue'
   import { useRouter } from 'vue-router'
   import ThreadEditor from '../components/ThreadEditor.vue'
@@ -51,8 +46,6 @@
     router.push({ name: 'Thread', params: { id: thread.id } })
   }
 
-  const { isReady, isLoading } = useAsyncState(async () => {
-    const thread = await fetchThread(props.id)
-    await fetchPost(thread.posts[0])
-  })
+  const fetchedThread = await fetchThread(props.id)
+  await fetchPost(fetchedThread.posts[0])
 </script>
