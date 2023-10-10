@@ -6,6 +6,7 @@
 </template>
 
 <script setup>
+  import { useProgressBar } from '@/composables/useProgressBar'
   import CategoryList from '../components/CategoryList.vue'
   import { useCategoriesStore } from '../stores/CategoriesStore'
   import { useForumsStore } from '../stores/ForumsStore'
@@ -13,8 +14,11 @@
   const categoriesStore = useCategoriesStore()
   const forumsStore = useForumsStore()
   const { fetchForums } = forumsStore
+  const { start, end } = useProgressBar()
 
+  start()
   const fetchedCategories = await categoriesStore.fetchAllCategories()
   const forumIds = fetchedCategories.map((c) => c.forums).flat()
   await fetchForums(forumIds)
+  end()
 </script>

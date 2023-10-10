@@ -15,6 +15,7 @@
   import { computed } from 'vue'
   import { useRouter } from 'vue-router'
   import ThreadEditor from '../components/ThreadEditor.vue'
+  import { useProgressBar } from '../composables/useProgressBar'
   import { findById } from '../helpers'
   import { useForumsStore } from '../stores/ForumsStore'
 
@@ -23,6 +24,8 @@
   })
 
   const router = useRouter()
+
+  const { start, end } = useProgressBar()
 
   const threadsStore = useThreadsStore()
 
@@ -40,5 +43,7 @@
     router.push({ name: 'Thread', params: { id: thread.id } })
   }
 
+  start()
   await fetchForum(props.forumId)
+  end()
 </script>

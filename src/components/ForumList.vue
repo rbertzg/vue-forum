@@ -17,6 +17,7 @@
 
 <script setup>
   import { computed } from 'vue'
+  import { useProgressBar } from '../composables/useProgressBar'
   import { findById } from '../helpers'
   import { useCategoriesStore } from '../stores/CategoriesStore'
   import { useForumsStore } from '../stores/ForumsStore'
@@ -25,6 +26,8 @@
   const props = defineProps({
     categoryId: { type: String, required: true },
   })
+
+  const { start, end } = useProgressBar()
 
   const categoriesStore = useCategoriesStore()
   const { fetchCategory } = categoriesStore
@@ -43,7 +46,9 @@
   )
 
   if (!categoryExists) {
+    start()
     const category = await fetchCategory(props.categoryId)
     await fetchForums(category.forums)
+    end()
   }
 </script>

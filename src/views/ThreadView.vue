@@ -37,6 +37,7 @@
   import AppDate from '../components/AppDate.vue'
   import PostEditor from '../components/PostEditor.vue'
   import PostList from '../components/PostList.vue'
+  import { useProgressBar } from '../composables/useProgressBar'
   import { findById } from '../helpers'
   import { usePostsStore } from '../stores/PostsStore'
   import { useUsersStore } from '../stores/UsersStore'
@@ -44,6 +45,8 @@
   const props = defineProps({
     id: { type: String, required: true },
   })
+
+  const { start, end } = useProgressBar()
 
   const threadsStore = useThreadsStore()
   const { fetchThread } = threadsStore
@@ -71,8 +74,10 @@
     postsStore.createPost(post)
   }
 
+  start()
   const fetchedThread = await fetchThread(props.id)
   const fetchedPosts = await fetchPosts(fetchedThread.posts)
   const userIds = fetchedPosts.map((post) => post.userId)
   await fetchUsers(userIds)
+  end()
 </script>

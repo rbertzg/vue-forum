@@ -16,6 +16,7 @@
   import { computed } from 'vue'
   import { useRouter } from 'vue-router'
   import ThreadEditor from '../components/ThreadEditor.vue'
+  import { useProgressBar } from '../composables/useProgressBar'
   import { findById } from '../helpers'
 
   const props = defineProps({
@@ -23,6 +24,8 @@
   })
 
   const router = useRouter()
+
+  const { start, end } = useProgressBar()
 
   const threadsStore = useThreadsStore()
   const { fetchThread } = threadsStore
@@ -46,6 +49,8 @@
     router.push({ name: 'Thread', params: { id: thread.id } })
   }
 
+  start()
   const fetchedThread = await fetchThread(props.id)
   await fetchPost(fetchedThread.posts[0])
+  end()
 </script>

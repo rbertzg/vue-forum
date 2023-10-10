@@ -21,6 +21,7 @@
 
 <script setup>
   import ThreadList from '@/components/ThreadList.vue'
+  import { useProgressBar } from '@/composables/useProgressBar'
   import { ref } from 'vue'
   import { useForumsStore } from '../stores/ForumsStore'
   import { useThreadsStore } from '../stores/ThreadsStore'
@@ -29,6 +30,8 @@
   const props = defineProps({
     id: { type: String, required: true },
   })
+
+  const { start, end } = useProgressBar()
 
   const forumsStore = useForumsStore()
   const { fetchForum } = forumsStore
@@ -42,10 +45,12 @@
   const forum = ref()
   const threads = ref()
 
+  start()
   const fetchedForum = await fetchForum(props.id)
   const fetchedThreads = await fetchThreads(fetchedForum.threads)
   const userIds = fetchedThreads.map((thread) => thread.userId)
   await fetchUsers(userIds)
   forum.value = fetchedForum
   threads.value = fetchedThreads
+  end()
 </script>
