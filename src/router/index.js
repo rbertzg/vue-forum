@@ -20,6 +20,15 @@ const routes = [
     component: () => import('@/views/SignInView.vue'),
   },
   {
+    path: '/logout',
+    name: 'SignOut',
+    beforeEnter: async () => {
+      const usersStore = useUsersStore()
+      await usersStore.signOut()
+      return { name: 'Home' }
+    },
+  },
+  {
     path: '/me',
     name: 'Profile',
     component: () => import('@/views/ProfileView.vue'),
