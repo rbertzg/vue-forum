@@ -6,6 +6,8 @@
       :text="text"
       @cancel="cancel"
       @save="save"
+      @dirty="isFormDirty = true"
+      @clean="isFormDirty = false"
     />
   </div>
 </template>
@@ -13,8 +15,8 @@
 <script setup>
   import { usePostsStore } from '@/stores/PostsStore'
   import { useThreadsStore } from '@/stores/ThreadsStore'
-  import { computed } from 'vue'
-  import { useRouter } from 'vue-router'
+  import { computed, ref } from 'vue'
+  import { onBeforeRouteLeave, useRouter } from 'vue-router'
   import ThreadEditor from '../components/ThreadEditor.vue'
   import { useProgressBar } from '../composables/useProgressBar'
   import { findById } from '../helpers'
@@ -35,6 +37,7 @@
 
   const thread = computed(() => findById(threadsStore.threads, props.id))
 
+  const isFormDirty = ref(false)
   const text = computed(() => {
     const post = findById(postsStore.posts, thread.value.posts[0])
     return post ? post.text : ''
@@ -53,4 +56,11 @@
   const fetchedThread = await fetchThread(props.id)
   await fetchPost(fetchedThread.posts[0])
   end()
+
+  onBeforeRouteLeave(() => {
+    if (isFormDirty.value) {
+      const confirmed = confirm('Do you really want to leave? you have unsaved changes!')
+      if (!confirmed) return false
+    }
+  })
 </script>

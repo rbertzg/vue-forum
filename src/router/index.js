@@ -1,6 +1,7 @@
 import HomeView from '@/views/HomeView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { useUnsubscribesStore } from '../stores/UnsubscribesStore'
+import { useUsersStore } from '../stores/UsersStore'
 
 const routes = [
   {
@@ -23,6 +24,10 @@ const routes = [
     name: 'Profile',
     component: () => import('@/views/ProfileView.vue'),
     meta: { toTop: true, smoothScroll: true },
+    beforeEnter: () => {
+      const usersStore = useUsersStore()
+      if (!usersStore.authId) return { name: 'Home' }
+    },
   },
   {
     path: '/me/edit',

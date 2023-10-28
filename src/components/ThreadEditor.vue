@@ -41,16 +41,16 @@
 </template>
 
 <script setup>
-  import { computed, ref } from 'vue'
+  import { computed, reactive, watch } from 'vue'
 
   const props = defineProps({
     title: { type: String, default: '' },
     text: { type: String, default: '' },
   })
 
-  const emit = defineEmits(['save', 'cancel'])
+  const emit = defineEmits(['save', 'cancel', 'dirty', 'clean'])
 
-  const form = ref({
+  const form = reactive({
     title: props.title,
     text: props.text,
   })
@@ -58,6 +58,15 @@
   const existing = computed(() => !!props.title)
 
   function save() {
-    emit('save', form.value)
+    emit('clean')
+    emit('save', form)
   }
+
+  watch(form, () => {
+    if (form.title !== props.title || form.text !== props.text) {
+      emit('dirty')
+    } else {
+      emit('clean')
+    }
+  })
 </script>

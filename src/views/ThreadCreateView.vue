@@ -6,19 +6,20 @@
     <ThreadEditor
       @cancel="cancel"
       @save="save"
+      @dirty="isFormDirty = true"
+      @clean="isFormDirty = false"
     />
   </div>
 </template>
 
 <script setup>
   import { useThreadsStore } from '@/stores/ThreadsStore'
-  import { computed } from 'vue'
-  import { useRouter } from 'vue-router'
+  import { computed, ref } from 'vue'
+  import { onBeforeRouteLeave, useRouter } from 'vue-router'
   import ThreadEditor from '../components/ThreadEditor.vue'
   import { useProgressBar } from '../composables/useProgressBar'
   import { findById } from '../helpers'
   import { useForumsStore } from '../stores/ForumsStore'
-
   const props = defineProps({
     forumId: { type: String, required: true },
   })
@@ -32,6 +33,7 @@
   const forumsStore = useForumsStore()
   const { fetchForum } = forumsStore
 
+  const isFormDirty = ref(false)
   const forum = computed(() => findById(forumsStore.forums, props.forumId))
 
   function cancel() {
@@ -46,4 +48,11 @@
   start()
   await fetchForum(props.forumId)
   end()
+
+  onBeforeRouteLeave(() => {
+    if (isFormDirty.value) {
+      const confirmed = confirm('Do you really want to leave? you have unsaved changes!')
+      if (!confirmed) return false
+    }
+  })
 </script>
