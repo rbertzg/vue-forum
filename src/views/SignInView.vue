@@ -38,7 +38,12 @@
         </div>
       </form>
       <div class="push-top text-center">
-        <button class="btn-red btn-xsmall">Sign in with Google</button>
+        <button
+          @click="signInGoogle"
+          class="btn-red btn-xsmall"
+        >
+          Sign in with Google
+        </button>
       </div>
     </div>
   </div>
@@ -49,7 +54,7 @@
   import { useUsersStore } from '../stores/UsersStore'
 
   const usersStore = useUsersStore()
-  const { signInWithEmailAndPassword } = usersStore
+  const { signInWithEmailAndPassword, signInWithGoogle } = usersStore
 
   const form = reactive({
     email: '',
@@ -65,5 +70,10 @@
     } catch (error) {
       alert(error.message)
     }
+  }
+
+  const signInGoogle = async () => {
+    await signInWithGoogle()
+    router.push('/')
   }
 </script>

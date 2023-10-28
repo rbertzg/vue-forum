@@ -1,10 +1,12 @@
 import { usePostsStore } from '@/stores/PostsStore'
 import { useThreadsStore } from '@/stores/ThreadsStore'
 import {
+  GoogleAuthProvider,
   createUserWithEmailAndPassword,
   getAuth,
   onAuthStateChanged,
   signInWithEmailAndPassword as signInWithEmailAndPasswordFirebase,
+  signInWithPopup,
   signOut as signOutFirebase,
 } from 'firebase/auth'
 import { doc, getDoc, getFirestore, serverTimestamp, setDoc } from 'firebase/firestore'
@@ -12,10 +14,12 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { fetchAllItems, fetchItem, fetchItems } from '../api'
 import { docToResource, findById, upsert } from '../helpers'
+import { useUnsubscribesStore } from './UnsubscribesStore'
 
 export const useUsersStore = defineStore('UsersStore', () => {
   const postsStore = usePostsStore()
   const threadsStore = useThreadsStore()
+  const unsubscribesStore = useUnsubscribesStore()
   const db = getFirestore()
 
   const users = ref([])
@@ -23,6 +27,7 @@ export const useUsersStore = defineStore('UsersStore', () => {
 
   const auth = getAuth()
   onAuthStateChanged(auth, (user) => {
+    unsubscribesStore.unsubscribeAuthUserSnapshot()
     if (user) {
       fetchAuthUser()
     }
@@ -80,6 +85,26 @@ export const useUsersStore = defineStore('UsersStore', () => {
     const auth = getAuth()
     signInWithEmailAndPasswordFirebase(auth, email, password)
   }
+  async function signInWithGoogle() {
+    const provider = new GoogleAuthProvider()
+    const auth = getAuth()
+
+    const result = await signInWithPopup(auth, provider)
+    const user = result.user
+
+    const userRef = doc(db, 'users', user.uid)
+    const userDoc = await getDoc(userRef)
+
+    if (!userDoc.exists()) {
+      await createUser({
+        id: user.uid,
+        email: user.email,
+        username: user.email,
+        name: user.displayName,
+        avatar: user.photoURL,
+      })
+    }
+  }
   async function signOut() {
     const auth = getAuth()
     signOutFirebase(auth)
@@ -90,11 +115,14 @@ export const useUsersStore = defineStore('UsersStore', () => {
   const fetchUser = (id) => fetchItem('users', id, users.value)
   const fetchUsers = (ids) => fetchItems('users', ids, users.value)
   const fetchAllUsers = () => fetchAllItems('users', users.value)
+
   const fetchAuthUser = () => {
     const auth = getAuth()
     const userId = auth.currentUser?.uid
     if (!userId) return
-    fetchItem('users', userId, users.value)
+    fetchItem('users', userId, users.value, (unsubscribe) => {
+      unsubscribesStore.setAuthUserUnsubscribe(unsubscribe)
+    })
     setAuthId(userId)
   }
 
@@ -107,6 +135,7 @@ export const useUsersStore = defineStore('UsersStore', () => {
     createUser,
     registerUserWithEmailAndPassword,
     signInWithEmailAndPassword,
+    signInWithGoogle,
     signOut,
     setUser,
     fetchUser,

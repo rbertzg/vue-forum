@@ -61,7 +61,12 @@
         </div>
       </form>
       <div class="text-center push-top">
-        <button class="btn-red btn-xsmall">Sign up with Google</button>
+        <button
+          @click="registerWithGoogle"
+          class="btn-red btn-xsmall"
+        >
+          Sign up with Google
+        </button>
       </div>
     </div>
   </div>
@@ -73,7 +78,7 @@
   import { useUsersStore } from '../stores/UsersStore'
 
   const usersStore = useUsersStore()
-  const { registerUserWithEmailAndPassword } = usersStore
+  const { registerUserWithEmailAndPassword, signInWithGoogle } = usersStore
 
   const router = useRouter()
 
@@ -87,6 +92,11 @@
 
   async function register() {
     await registerUserWithEmailAndPassword(form)
+    router.push('/')
+  }
+
+  async function registerWithGoogle() {
+    await signInWithGoogle()
     router.push('/')
   }
 </script>

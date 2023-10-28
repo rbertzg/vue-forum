@@ -3,7 +3,7 @@ import { collection, doc, getDocs, getFirestore, onSnapshot } from 'firebase/fir
 import { upsert } from '../helpers'
 import { useUnsubscribesStore } from '../stores/UnsubscribesStore'
 
-export const fetchItem = async (collection, id, resources) => {
+export const fetchItem = async (collection, id, resources, handleUnsubscribe = null) => {
   const db = getFirestore()
   const unsubscribesStore = useUnsubscribesStore()
   return new Promise((resolve) => {
@@ -13,9 +13,14 @@ export const fetchItem = async (collection, id, resources) => {
     const unsubscribe = onSnapshot(docRef, (doc) => {
       item = { ...doc.data(), id: doc.id }
       upsert(resources, item)
-      unsubscribesStore.addUnsubscribe(unsubscribe)
       resolve(item)
     })
+
+    if (handleUnsubscribe) {
+      handleUnsubscribe(unsubscribe)
+    } else {
+      unsubscribesStore.addUnsubscribe(unsubscribe)
+    }
   })
 }
 
