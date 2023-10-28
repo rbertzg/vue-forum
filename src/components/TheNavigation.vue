@@ -17,33 +17,50 @@
     <nav class="navbar">
       <ul>
         <li
-          v-if="usersStore.authUser"
+          v-if="authUser"
           class="navbar-user"
         >
-          <RouterLink :to="{ name: 'Profile' }">
+          <a @click.prevent="userDropdownOpen = !userDropdownOpen">
             <img
               class="avatar-small"
-              :src="usersStore.authUser.avatar"
+              :src="authUser.avatar"
               alt=""
             />
             <span>
-              {{ usersStore.authUser.name }}
+              {{ authUser.name }}
               <img
                 class="icon-profile"
                 src="../assets/arrow-profile.svg"
                 alt=""
               />
             </span>
-          </RouterLink>
-          <div id="user-dropdown">
+          </a>
+          <div
+            id="user-dropdown"
+            :class="{ 'active-drop': userDropdownOpen }"
+          >
             <div class="triangle-drop"></div>
             <ul class="dropdown-menu">
               <li class="dropdown-menu-item">
-                <a href="profile.html">View profile</a>
+                <RouterLink :to="{ name: 'Profile' }">View profile</RouterLink>
               </li>
-              <li class="dropdown-menu-item"><a href="#">Log out</a></li>
+              <li class="dropdown-menu-item">
+                <a @click.prevent="signOut">Sign Out</a>
+              </li>
             </ul>
           </div>
+        </li>
+        <li
+          v-if="!authUser"
+          class="navbar-item"
+        >
+          <RouterLink :to="{ name: 'SignIn' }">Sign In</RouterLink>
+        </li>
+        <li
+          v-if="!authUser"
+          class="navbar-item"
+        >
+          <RouterLink :to="{ name: 'Register' }">Register</RouterLink>
         </li>
       </ul>
       <!--      <ul>-->
@@ -72,7 +89,13 @@
 </template>
 
 <script setup>
+  import { storeToRefs } from 'pinia'
+  import { ref } from 'vue'
   import { useUsersStore } from '../stores/UsersStore'
 
   const usersStore = useUsersStore()
+  const { authUser } = storeToRefs(usersStore)
+  const { signOut } = usersStore
+
+  const userDropdownOpen = ref(false)
 </script>

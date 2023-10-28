@@ -14,6 +14,11 @@ const routes = [
     component: () => import('@/views/RegisterView.vue'),
   },
   {
+    path: '/sign-in',
+    name: 'SignIn',
+    component: () => import('@/views/SignInView.vue'),
+  },
+  {
     path: '/me',
     name: 'Profile',
     component: () => import('@/views/ProfileView.vue'),

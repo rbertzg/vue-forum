@@ -6,7 +6,6 @@
         class="card card-form"
       >
         <h1 class="text-center">Register</h1>
-
         <div class="form-group">
           <label for="name">Full Name</label>
           <input
@@ -16,7 +15,6 @@
             class="form-input"
           />
         </div>
-
         <div class="form-group">
           <label for="username">Username</label>
           <input
@@ -26,7 +24,6 @@
             class="form-input"
           />
         </div>
-
         <div class="form-group">
           <label for="email">Email</label>
           <input
@@ -36,7 +33,6 @@
             class="form-input"
           />
         </div>
-
         <div class="form-group">
           <label for="password">Password</label>
           <input
@@ -46,7 +42,6 @@
             class="form-input"
           />
         </div>
-
         <div class="form-group">
           <label for="avatar">Avatar</label>
           <input
@@ -56,7 +51,6 @@
             class="form-input"
           />
         </div>
-
         <div class="form-actions">
           <button
             type="submit"
@@ -67,9 +61,7 @@
         </div>
       </form>
       <div class="text-center push-top">
-        <button class="btn-red btn-xsmall">
-          <i class="fa fa-google fa-btn"></i>Sign up with Google
-        </button>
+        <button class="btn-red btn-xsmall">Sign up with Google</button>
       </div>
     </div>
   </div>
