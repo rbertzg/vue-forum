@@ -20,6 +20,7 @@
   import { useProgressBar } from '../composables/useProgressBar'
   import { findById } from '../helpers'
   import { useForumsStore } from '../stores/ForumsStore'
+
   const props = defineProps({
     forumId: { type: String, required: true },
   })

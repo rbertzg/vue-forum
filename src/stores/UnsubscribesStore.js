@@ -4,6 +4,7 @@ import { ref } from 'vue'
 export const useUnsubscribesStore = defineStore('UnsubscribesStore', () => {
   const unsubscribes = ref([])
   const authUserUnsubscribe = ref(null)
+  const authObserverUnsubscribe = ref(null)
 
   const addUnsubscribe = (fn) => {
     unsubscribes.value.push(fn)
@@ -11,6 +12,10 @@ export const useUnsubscribesStore = defineStore('UnsubscribesStore', () => {
 
   const setAuthUserUnsubscribe = (fn) => {
     authUserUnsubscribe.value = fn
+  }
+
+  const setAuthObserverUnsubscribe = (fn) => {
+    authObserverUnsubscribe.value = fn
   }
 
   const unsubscribeAllSnapshots = async () => {
@@ -32,8 +37,10 @@ export const useUnsubscribesStore = defineStore('UnsubscribesStore', () => {
 
   return {
     unsubscribes,
+    authObserverUnsubscribe,
     addUnsubscribe,
     setAuthUserUnsubscribe,
+    setAuthObserverUnsubscribe,
     unsubscribeAuthUserSnapshot,
     unsubscribeAllSnapshots,
     clearAllUnsubscribes,

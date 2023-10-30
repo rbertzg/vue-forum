@@ -25,14 +25,6 @@ export const useUsersStore = defineStore('UsersStore', () => {
   const users = ref([])
   const authId = ref(null)
 
-  const auth = getAuth()
-  onAuthStateChanged(auth, (user) => {
-    unsubscribesStore.unsubscribeAuthUserSnapshot()
-    if (user) {
-      fetchAuthUser()
-    }
-  })
-
   const user = computed(() => {
     return (id) => {
       const user = findById(users.value, id)
@@ -52,9 +44,24 @@ export const useUsersStore = defineStore('UsersStore', () => {
       }
     }
   })
-
   const authUser = computed(() => findById(users.value, authId.value))
 
+  function initAuthentication() {
+    if (unsubscribesStore.authObserverUnsubscribe) {
+      unsubscribesStore.authObserverUnsubscribe()
+    }
+    return new Promise((resolve) => {
+      const auth = getAuth()
+      const unsubscribe = onAuthStateChanged(auth, async (user) => {
+        unsubscribesStore.unsubscribeAuthUserSnapshot()
+        if (user) {
+          await fetchAuthUser()
+          resolve(user)
+        } else resolve(null)
+      })
+      unsubscribesStore.setAuthObserverUnsubscribe(unsubscribe)
+    })
+  }
   async function createUser({ id, email, username, name, avatar = null }) {
     const registeredAt = serverTimestamp()
     const usernameLower = username.toLowerCase()
@@ -115,12 +122,11 @@ export const useUsersStore = defineStore('UsersStore', () => {
   const fetchUser = (id) => fetchItem('users', id, users.value)
   const fetchUsers = (ids) => fetchItems('users', ids, users.value)
   const fetchAllUsers = () => fetchAllItems('users', users.value)
-
-  const fetchAuthUser = () => {
+  async function fetchAuthUser() {
     const auth = getAuth()
     const userId = auth.currentUser?.uid
     if (!userId) return
-    fetchItem('users', userId, users.value, (unsubscribe) => {
+    await fetchItem('users', userId, users.value, (unsubscribe) => {
       unsubscribesStore.setAuthUserUnsubscribe(unsubscribe)
     })
     setAuthId(userId)
@@ -131,6 +137,7 @@ export const useUsersStore = defineStore('UsersStore', () => {
     user,
     authUser,
     authId,
+    initAuthentication,
     setAuthId,
     createUser,
     registerUserWithEmailAndPassword,

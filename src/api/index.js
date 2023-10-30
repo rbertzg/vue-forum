@@ -8,12 +8,15 @@ export const fetchItem = async (collection, id, resources, handleUnsubscribe = n
   const unsubscribesStore = useUnsubscribesStore()
   return new Promise((resolve) => {
     const docRef = doc(db, collection, id)
-
     let item
     const unsubscribe = onSnapshot(docRef, (doc) => {
-      item = { ...doc.data(), id: doc.id }
-      upsert(resources, item)
-      resolve(item)
+      if (doc.exists()) {
+        item = { ...doc.data(), id: doc.id }
+        upsert(resources, item)
+        resolve(item)
+      } else {
+        resolve(null)
+      }
     })
 
     if (handleUnsubscribe) {
