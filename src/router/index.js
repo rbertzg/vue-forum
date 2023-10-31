@@ -14,11 +14,13 @@ const routes = [
     path: '/register',
     name: 'Register',
     component: () => import('@/views/RegisterView.vue'),
+    meta: { requiresGuest: true },
   },
   {
     path: '/sign-in',
     name: 'SignIn',
     component: () => import('@/views/SignInView.vue'),
+    meta: { requiresGuest: true },
   },
   {
     path: '/logout',
@@ -111,12 +113,17 @@ const router = createRouter({
 router.beforeEach(async (to) => {
   const usersStore = useUsersStore()
   await usersStore.initAuthentication()
-  if (to.meta.requiresAuth && !usersStore.authId) {
-    return { name: 'Home' }
-  }
 
   const unsubscribesStore = useUnsubscribesStore()
   unsubscribesStore.unsubscribeAllSnapshots()
+
+  if (to.meta.requiresAuth && !usersStore.authId) {
+    return { name: 'SignIn', query: { redirectTo: to.path } }
+  }
+
+  if (to.meta.requiresGuest && usersStore.authId) {
+    return { name: 'Home' }
+  }
 })
 
 export default router

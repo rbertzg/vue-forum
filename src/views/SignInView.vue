@@ -50,7 +50,7 @@
 </template>
 <script setup>
   import { reactive } from 'vue'
-  import { useRouter } from 'vue-router'
+  import { useRoute, useRouter } from 'vue-router'
   import { useUsersStore } from '../stores/UsersStore'
 
   const usersStore = useUsersStore()
@@ -62,11 +62,12 @@
   })
 
   const router = useRouter()
+  const route = useRoute()
 
   const signIn = async () => {
     try {
       await signInWithEmailAndPassword(form)
-      router.push('/')
+      successRedirect()
     } catch (error) {
       alert(error.message)
     }
@@ -74,6 +75,11 @@
 
   const signInGoogle = async () => {
     await signInWithGoogle()
-    router.push('/')
+    successRedirect()
+  }
+
+  const successRedirect = () => {
+    const redirectTo = route.query.redirectTo || { name: 'Home' }
+    router.push(redirectTo)
   }
 </script>
