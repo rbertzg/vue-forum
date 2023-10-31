@@ -2,6 +2,7 @@
   <div class="col-large push-top">
     <h1>{{ thread.title }}</h1>
     <RouterLink
+      v-if="thread.userId === usersStore.authUser?.id"
       :to="{
         name: 'ThreadEdit',
         params: {
@@ -27,7 +28,24 @@
       >
     </p>
     <PostList :posts="posts" />
-    <PostEditor @save="addPost" />
+    <PostEditor
+      v-if="usersStore.authUser"
+      @save="addPost"
+    />
+    <div
+      v-else
+      class="text-center"
+      style="mb-10"
+    >
+      <RouterLink :to="{ name: 'SignIn', query: { redirectTo: $route.path } }">
+        Sign In
+      </RouterLink>
+      or
+      <RouterLink :to="{ name: 'Register', query: { redirectTo: $route.path } }"
+        >Register
+      </RouterLink>
+      to reply
+    </div>
   </div>
 </template>
 
