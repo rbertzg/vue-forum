@@ -5,10 +5,13 @@ import {
   collection,
   doc,
   getDoc,
+  getDocs,
   getFirestore,
   increment,
+  query,
   serverTimestamp,
   updateDoc,
+  where,
   writeBatch,
 } from 'firebase/firestore'
 import { defineStore } from 'pinia'
@@ -75,6 +78,20 @@ export const usePostsStore = defineStore('PostsStore', () => {
   const fetchPost = (id) => fetchItem('posts', id, posts.value)
   const fetchPosts = (ids) => fetchItems('posts', ids, posts.value)
   const fetchAllPosts = () => fetchAllItems('posts', posts.value)
+  const fetchAuthUserPosts = async () => {
+    const q = query(collection(db, 'posts'), where('userId', '==', usersStore.authId))
+    const querySnapshot = await getDocs(q)
+    querySnapshot.forEach((post) => setPost(post))
+  }
 
-  return { posts, setPost, createPost, updatePost, fetchPost, fetchPosts, fetchAllPosts }
+  return {
+    posts,
+    setPost,
+    createPost,
+    updatePost,
+    fetchPost,
+    fetchPosts,
+    fetchAllPosts,
+    fetchAuthUserPosts,
+  }
 })

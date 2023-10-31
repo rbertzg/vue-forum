@@ -9,7 +9,7 @@ import {
   signInWithPopup,
   signOut as signOutFirebase,
 } from 'firebase/auth'
-import { doc, getDoc, getFirestore, serverTimestamp, setDoc } from 'firebase/firestore'
+import { doc, getDoc, getFirestore, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { fetchAllItems, fetchItem, fetchItems } from '../api'
@@ -119,6 +119,20 @@ export const useUsersStore = defineStore('UsersStore', () => {
   }
   const setAuthId = (id) => (authId.value = id)
   const setUser = (user) => upsert(users.value, docToResource(user))
+  const updateUser = async (user) => {
+    const updates = {
+      avatar: user.avatar || null,
+      username: user.username || null,
+      name: user.name || null,
+      bio: user.bio || null,
+      website: user.website || null,
+      email: user.email || null,
+      location: user.location || null,
+    }
+
+    const userRef = doc(db, 'users', user.id)
+    await updateDoc(userRef, updates)
+  }
   const fetchUser = (id) => fetchItem('users', id, users.value)
   const fetchUsers = (ids) => fetchItems('users', ids, users.value)
   const fetchAllUsers = () => fetchAllItems('users', users.value)
@@ -145,6 +159,7 @@ export const useUsersStore = defineStore('UsersStore', () => {
     signInWithGoogle,
     signOut,
     setUser,
+    updateUser,
     fetchUser,
     fetchUsers,
     fetchAllUsers,
