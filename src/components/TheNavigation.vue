@@ -63,27 +63,6 @@
           <RouterLink :to="{ name: 'Register' }">Register</RouterLink>
         </li>
       </ul>
-      <!--      <ul>-->
-      <!--        <li class="navbar-item">-->
-      <!--          <a href="index.html">Home</a>-->
-      <!--        </li>-->
-      <!--        <li class="navbar-item">-->
-      <!--          <a href="category.html">Category</a>-->
-      <!--        </li>-->
-      <!--        <li class="navbar-item">-->
-      <!--          <a href="forum.html">Forum</a>-->
-      <!--        </li>-->
-      <!--        <li class="navbar-item">-->
-      <!--          <a href="thread.html">Thread</a>-->
-      <!--        </li>-->
-      <!--        &lt;!&ndash; Show these option only on mobile&ndash;&gt;-->
-      <!--        <li class="navbar-item mobile-only">-->
-      <!--          <a href="profile.html">My Profile</a>-->
-      <!--        </li>-->
-      <!--        <li class="navbar-item mobile-only">-->
-      <!--          <a href="#">Logout</a>-->
-      <!--        </li>-->
-      <!--      </ul>-->
     </nav>
   </header>
 </template>
@@ -91,11 +70,11 @@
 <script setup>
   import { storeToRefs } from 'pinia'
   import { ref } from 'vue'
-  import { useUsersStore } from '../stores/UsersStore'
+  import { useAuthStore } from '../stores/AuthStore'
 
-  const usersStore = useUsersStore()
-  const { authUser } = storeToRefs(usersStore)
-  const { signOut } = usersStore
+  const authStore = useAuthStore()
+  const { authUser } = storeToRefs(authStore)
+  const { signOut } = authStore
 
   const userDropdownOpen = ref(false)
 </script>

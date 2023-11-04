@@ -14,9 +14,11 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { fetchAllItems, fetchItem, fetchItems } from '../api'
 import { docToResource, findById, upsert } from '../helpers'
+import { useAuthStore } from './AuthStore'
 
 export const useThreadsStore = defineStore('ThreadsStore', () => {
   const usersStore = useUsersStore()
+  const authStore = useAuthStore()
   const postsStore = usePostsStore()
   const forumsStore = useForumsStore()
   const db = getFirestore()
@@ -44,13 +46,8 @@ export const useThreadsStore = defineStore('ThreadsStore', () => {
   })
 
   async function createThread({ title, text, forumId }) {
-    const userId = usersStore.authId
+    const userId = authStore.authId
     const publishedAt = serverTimestamp()
-    // thread.value.posts = []
-    // thread.value.contributors = []
-    // if (!thread.value.contributors.includes(usersStore.authId)) {
-    //   thread.value.contributors.push(usersStore.authId)
-    // }
 
     const threadRef = doc(collection(db, 'threads'))
     const thread = {
@@ -76,13 +73,6 @@ export const useThreadsStore = defineStore('ThreadsStore', () => {
     const newThread = await getDoc(threadRef)
 
     upsert(threads.value, { ...newThread.data(), id: newThread.id })
-
-    // function upsertProperty(store, itemId, propertyName, newValue) {
-    //   const item = findById(store, itemId);
-    //   if (item) {
-    //     item[propertyName] = newValue;
-    //   }
-    // }
 
     const user = findById(usersStore.users, newThread.userId)
     if (user) {

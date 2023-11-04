@@ -15,12 +15,10 @@
 <script setup>
   import AppSpinner from './components/AppSpinner.vue'
   import TheNavigation from './components/TheNavigation.vue'
-  import { useUsersStore } from './stores/UsersStore'
+  import { useAuthStore } from './stores/AuthStore'
 
-  const usersStore = useUsersStore()
-  const { fetchAuthUser } = usersStore
-
-  fetchAuthUser()
+  const authStore = useAuthStore()
+  authStore.fetchAuthUser()
 </script>
 
 <style>

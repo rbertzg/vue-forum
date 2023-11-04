@@ -1,8 +1,8 @@
 import HomeView from '@/views/HomeView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from '../stores/AuthStore'
 import { useThreadsStore } from '../stores/ThreadsStore'
 import { useUnsubscribesStore } from '../stores/UnsubscribesStore'
-import { useUsersStore } from '../stores/UsersStore'
 
 const routes = [
   {
@@ -18,6 +18,7 @@ const routes = [
   },
   {
     path: '/sign-in',
+    alias: '/login',
     name: 'SignIn',
     component: () => import('@/views/SignInView.vue'),
     meta: { requiresGuest: true },
@@ -26,8 +27,8 @@ const routes = [
     path: '/logout',
     name: 'SignOut',
     beforeEnter: async () => {
-      const usersStore = useUsersStore()
-      await usersStore.signOut()
+      const authStore = useAuthStore()
+      await authStore.signOut()
       return { name: 'Home' }
     },
   },
@@ -111,17 +112,17 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to) => {
-  const usersStore = useUsersStore()
-  await usersStore.initAuthentication()
+  const authStore = useAuthStore()
+  await authStore.initAuthentication()
 
   const unsubscribesStore = useUnsubscribesStore()
   unsubscribesStore.unsubscribeAllSnapshots()
 
-  if (to.meta.requiresAuth && !usersStore.authId) {
+  if (to.meta.requiresAuth && !authStore.authId) {
     return { name: 'SignIn', query: { redirectTo: to.path } }
   }
 
-  if (to.meta.requiresGuest && usersStore.authId) {
+  if (to.meta.requiresGuest && authStore.authId) {
     return { name: 'Home' }
   }
 })

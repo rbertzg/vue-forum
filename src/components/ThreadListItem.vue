@@ -1,11 +1,9 @@
 <template>
   <div class="thread">
     <div>
-      <p>
-        <RouterLink :to="{ name: 'Thread', params: { id: thread.id } }">
-          {{ thread.title }}
-        </RouterLink>
-      </p>
+      <RouterLink :to="{ name: 'Thread', params: { id: thread.id } }">
+        {{ thread.title }}
+      </RouterLink>
       <p class="text-faded text-xsmall">
         By <a href="#">{{ user.name }}</a
         >, <AppDate :timestamp="thread.publishedAt" />.
@@ -43,8 +41,6 @@
 
   const usersStore = useUsersStore()
 
-  const user = computed(
-    () => findById(usersStore.users, props.thread.userId) || {}
-  )
+  const user = computed(() => findById(usersStore.users, props.thread.userId) || {})
   const repliesCount = computed(() => props.thread.posts?.length - 1 || 0)
 </script>

@@ -2,7 +2,7 @@
   <div class="col-large push-top">
     <h1>{{ thread.title }}</h1>
     <RouterLink
-      v-if="thread.userId === usersStore.authUser?.id"
+      v-if="thread.userId === authStore.authUser?.id"
       :to="{
         name: 'ThreadEdit',
         params: {
@@ -29,7 +29,7 @@
     </p>
     <PostList :posts="posts" />
     <PostEditor
-      v-if="usersStore.authUser"
+      v-if="authStore.authUser"
       @save="addPost"
     />
     <div
@@ -57,6 +57,7 @@
   import PostList from '../components/PostList.vue'
   import { useProgressBar } from '../composables/useProgressBar'
   import { findById } from '../helpers'
+  import { useAuthStore } from '../stores/AuthStore'
   import { usePostsStore } from '../stores/PostsStore'
   import { useUsersStore } from '../stores/UsersStore'
 
@@ -74,6 +75,8 @@
 
   const usersStore = useUsersStore()
   const { fetchUsers } = usersStore
+
+  const authStore = useAuthStore()
 
   const thread = computed(() => findById(threadsStore.threads, props.id))
 

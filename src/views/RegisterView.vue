@@ -75,10 +75,10 @@
 <script setup>
   import { reactive } from 'vue'
   import { useRouter } from 'vue-router'
-  import { useUsersStore } from '../stores/UsersStore'
+  import { useAuthStore } from '../stores/AuthStore'
 
-  const usersStore = useUsersStore()
-  const { registerUserWithEmailAndPassword, signInWithGoogle } = usersStore
+  const authStore = useAuthStore()
+  const { registerUserWithEmailAndPassword, signInWithGoogle } = authStore
 
   const router = useRouter()
 

@@ -1,5 +1,4 @@
 import { useThreadsStore } from '@/stores/ThreadsStore'
-import { useUsersStore } from '@/stores/UsersStore'
 import {
   arrayUnion,
   collection,
@@ -18,10 +17,11 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { fetchAllItems, fetchItem, fetchItems } from '../api'
 import { docToResource, findById, upsert } from '../helpers'
+import { useAuthStore } from './AuthStore'
 
 export const usePostsStore = defineStore('PostsStore', () => {
   const posts = ref([])
-  const usersStore = useUsersStore()
+  const authStore = useAuthStore()
   const threadsStore = useThreadsStore()
   const db = getFirestore()
 
@@ -30,7 +30,7 @@ export const usePostsStore = defineStore('PostsStore', () => {
       text,
       edited: {
         at: serverTimestamp(),
-        by: usersStore.authId,
+        by: authStore.authId,
         moderated: false,
       },
     }
@@ -42,17 +42,17 @@ export const usePostsStore = defineStore('PostsStore', () => {
   }
 
   async function createPost(post) {
-    post.userId = usersStore.authId
+    post.userId = authStore.authId
     post.publishedAt = serverTimestamp()
 
     const postRef = doc(collection(db, 'posts'))
     const threadRef = doc(db, 'threads', post.threadId)
-    const userRef = doc(db, 'users', usersStore.authId)
+    const userRef = doc(db, 'users', authStore.authId)
     await writeBatch(db)
       .set(postRef, post)
       .update(threadRef, {
         posts: arrayUnion(postRef.id),
-        contributors: arrayUnion(usersStore.authId),
+        contributors: arrayUnion(authStore.authId),
       })
       .update(userRef, {
         postsCount: increment(1),
@@ -71,7 +71,7 @@ export const usePostsStore = defineStore('PostsStore', () => {
     if (!thread.contributors) {
       thread.contributors = []
     }
-    upsert(thread.contributors, usersStore.authId)
+    upsert(thread.contributors, authStore.authId)
   }
 
   const setPost = (post) => upsert(posts.value, docToResource(post))
@@ -79,7 +79,7 @@ export const usePostsStore = defineStore('PostsStore', () => {
   const fetchPosts = (ids) => fetchItems('posts', ids, posts.value)
   const fetchAllPosts = () => fetchAllItems('posts', posts.value)
   const fetchAuthUserPosts = async () => {
-    const q = query(collection(db, 'posts'), where('userId', '==', usersStore.authId))
+    const q = query(collection(db, 'posts'), where('userId', '==', authStore.authId))
     const querySnapshot = await getDocs(q)
     querySnapshot.forEach((post) => setPost(post))
   }

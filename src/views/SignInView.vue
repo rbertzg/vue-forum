@@ -51,10 +51,10 @@
 <script setup>
   import { reactive } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { useUsersStore } from '../stores/UsersStore'
+  import { useAuthStore } from '../stores/AuthStore'
 
-  const usersStore = useUsersStore()
-  const { signInWithEmailAndPassword, signInWithGoogle } = usersStore
+  const authStore = useAuthStore()
+  const { signInWithEmailAndPassword, signInWithGoogle } = authStore
 
   const form = reactive({
     email: '',

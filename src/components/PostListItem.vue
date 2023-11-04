@@ -29,7 +29,7 @@
         <p>{{ post.text }}</p>
       </div>
       <a
-        v-show="post.userId === usersStore.authId"
+        v-show="post.userId === authStore.authId"
         @click.prevent="toggleEditMode(post.id)"
         href="#"
         style="margin-left: auto; padding-left: 20px"
@@ -54,6 +54,7 @@
 <script setup>
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
   import { computed, ref } from 'vue'
+  import { useAuthStore } from '../stores/AuthStore'
   import { usePostsStore } from '../stores/PostsStore'
   import { useUsersStore } from '../stores/UsersStore'
   import AppDate from './AppDate.vue'
@@ -66,6 +67,8 @@
   const postsStore = usePostsStore()
   const { updatePost } = postsStore
   const usersStore = useUsersStore()
+  const authStore = useAuthStore()
+
   const user = computed(() => usersStore.user(props.post.userId))
 
   const editing = ref(null)
