@@ -7,17 +7,19 @@ import {
   signInWithPopup,
   signOut as signOutFirebase,
 } from 'firebase/auth'
-import { doc, getDoc, getFirestore } from 'firebase/firestore'
+import { collection, doc, getDoc, getDocs, getFirestore, query, where } from 'firebase/firestore'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { fetchItem } from '../api'
 import { findById } from '../helpers'
+import { usePostsStore } from './PostsStore'
 import { useUnsubscribesStore } from './UnsubscribesStore'
 import { useUsersStore } from './UsersStore'
 
 export const useAuthStore = defineStore('AuthStore', () => {
   const db = getFirestore()
   const usersStore = useUsersStore()
+  const postsStore = usePostsStore()
   const unsubscribesStore = useUnsubscribesStore()
 
   const authId = ref(null)
@@ -33,6 +35,12 @@ export const useAuthStore = defineStore('AuthStore', () => {
       unsubscribesStore.setAuthUserUnsubscribe(unsubscribe)
     })
     setAuthId(authUser?.id)
+  }
+
+  const fetchAuthUserPosts = async () => {
+    const q = query(collection(db, 'posts'), where('userId', '==', authId.value))
+    const querySnapshot = await getDocs(q)
+    querySnapshot.forEach((post) => postsStore.setPost(post))
   }
 
   const initAuthentication = () => {
@@ -102,6 +110,7 @@ export const useAuthStore = defineStore('AuthStore', () => {
     setAuthId,
     authUser,
     fetchAuthUser,
+    fetchAuthUserPosts,
     initAuthentication,
     registerUserWithEmailAndPassword,
     signInWithEmailAndPassword,

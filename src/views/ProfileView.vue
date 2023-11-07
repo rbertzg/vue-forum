@@ -30,7 +30,6 @@
   import UserProfileCardEditor from '../components/UserProfileCardEditor.vue'
   import { useProgressBar } from '../composables/useProgressBar'
   import { useAuthStore } from '../stores/AuthStore'
-  import { usePostsStore } from '../stores/PostsStore'
   import { useUsersStore } from '../stores/UsersStore'
 
   defineProps({
@@ -39,13 +38,12 @@
 
   const usersStore = useUsersStore()
   const authStore = useAuthStore()
-  const postsStore = usePostsStore()
 
   const user = computed(() => usersStore.user(authStore.authId))
 
   const { start, end } = useProgressBar()
 
   start()
-  await postsStore.fetchAuthUserPosts()
+  await authStore.fetchAuthUserPosts()
   end()
 </script>
