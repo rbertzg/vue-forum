@@ -1,5 +1,7 @@
 <template>
   <header
+    v-click-outside="() => (mobileNavMenu = false)"
+    v-page-scroll="() => (mobileNavMenu = false)"
     class="header"
     id="header"
   >
@@ -9,18 +11,27 @@
     >
       <img src="../assets/vueschool-logo.svg" />
     </RouterLink>
-    <div class="btn-hamburger">
+    <div
+      @click="mobileNavMenu = !mobileNavMenu"
+      class="btn-hamburger"
+    >
       <div class="top bar"></div>
       <div class="middle bar"></div>
       <div class="bottom bar"></div>
     </div>
-    <nav class="navbar">
+    <nav
+      class="navbar"
+      :class="{ 'navbar-open': mobileNavMenu }"
+    >
       <ul>
         <li
           v-if="authUser"
           class="navbar-user"
         >
-          <a @click.prevent="userDropdownOpen = !userDropdownOpen">
+          <a
+            @click.prevent="userDropdownOpen = !userDropdownOpen"
+            v-click-outside="() => (userDropdownOpen = false)"
+          >
             <img
               class="avatar-small"
               :src="authUser.avatar"
@@ -62,6 +73,18 @@
         >
           <RouterLink :to="{ name: 'Register' }">Register</RouterLink>
         </li>
+        <li
+          v-if="authUser"
+          class="navbar-mobile-item"
+        >
+          <RouterLink :to="{ name: 'Profile' }">View Profile</RouterLink>
+        </li>
+        <li
+          v-if="authUser"
+          class="navbar-mobile-item"
+        >
+          <RouterLink :to="{ name: 'SignOut' }">Sign Out</RouterLink>
+        </li>
       </ul>
     </nav>
   </header>
@@ -70,11 +93,19 @@
 <script setup>
   import { storeToRefs } from 'pinia'
   import { ref } from 'vue'
+  import { useRouter } from 'vue-router'
   import { useAuthStore } from '../stores/AuthStore'
+
+  const router = useRouter()
 
   const authStore = useAuthStore()
   const { authUser } = storeToRefs(authStore)
   const { signOut } = authStore
 
   const userDropdownOpen = ref(false)
+  const mobileNavMenu = ref(false)
+
+  router.beforeEach(() => {
+    mobileNavMenu.value = false
+  })
 </script>
