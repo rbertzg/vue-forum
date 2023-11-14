@@ -15,6 +15,11 @@
     </div>
     <div class="push-top">
       <ThreadList :threads="threads" />
+      <VPagination
+        v-model="page"
+        :pages="totalPages"
+        active-color="#57AD8D"
+      />
     </div>
   </div>
 </template>
@@ -22,7 +27,7 @@
 <script setup>
   import ThreadList from '@/components/ThreadList.vue'
   import { useProgressBar } from '@/composables/useProgressBar'
-  import { ref } from 'vue'
+  import { computed, ref, watch } from 'vue'
   import { useForumsStore } from '../stores/ForumsStore'
   import { useThreadsStore } from '../stores/ThreadsStore'
   import { useUsersStore } from '../stores/UsersStore'
@@ -37,20 +42,30 @@
   const { fetchForum } = forumsStore
 
   const threadsStore = useThreadsStore()
-  const { fetchThreads } = threadsStore
+  const { fetchThreadsByPage } = threadsStore
 
   const usersStore = useUsersStore()
   const { fetchUsers } = usersStore
 
+  const page = ref(1)
+  const perPage = ref(10)
   const forum = ref()
   const threads = ref()
+  const threadCount = computed(() => forum.value.threads.length)
+  const totalPages = computed(() => Math.ceil(threadCount.value / perPage.value))
 
   start()
   const fetchedForum = await fetchForum(props.id)
-  const fetchedThreads = await fetchThreads(fetchedForum.threads)
+  const fetchedThreads = await fetchThreadsByPage(fetchedForum.threads, page.value, perPage.value)
   const userIds = fetchedThreads.map((thread) => thread.userId)
   await fetchUsers(userIds)
   forum.value = fetchedForum
   threads.value = fetchedThreads
   end()
+
+  watch(page, async () => {
+    threads.value = await fetchThreadsByPage(forum.value.threads, page.value, perPage.value)
+    const userIds = threads.value.map((thread) => thread.userId)
+    await fetchUsers(userIds)
+  })
 </script>

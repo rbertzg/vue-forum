@@ -10,6 +10,7 @@ import {
   serverTimestamp,
   writeBatch,
 } from 'firebase/firestore'
+import { chunk } from 'lodash'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { fetchAllItems, fetchItem, fetchItems } from '../api'
@@ -121,7 +122,14 @@ export const useThreadsStore = defineStore('ThreadsStore', () => {
   const setThread = (thread) => upsert(threads.value, docToResource(thread))
   const fetchThread = (id) => fetchItem('threads', id, threads.value)
   const fetchThreads = (ids) => fetchItems('threads', ids, threads.value)
+  const fetchThreadsByPage = (ids, page, perPage = 10) => {
+    clearThreads()
+    const chunks = chunk(ids, perPage)
+    const limitedIds = chunks[page - 1]
+    return fetchThreads(limitedIds)
+  }
   const fetchAllThreads = () => fetchAllItems('threads', threads.value)
+  const clearThreads = () => (threads.value = [])
 
   return {
     threads,
@@ -131,6 +139,8 @@ export const useThreadsStore = defineStore('ThreadsStore', () => {
     updateThread,
     fetchThread,
     fetchThreads,
+    fetchThreadsByPage,
     fetchAllThreads,
+    clearThreads,
   }
 })
