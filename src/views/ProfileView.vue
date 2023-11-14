@@ -18,6 +18,10 @@
         </div>
         <hr />
         <PostList :posts="user.posts" />
+        <AppInfiniteScroll
+          @load="authStore.fetchAuthUserPosts(lastPostFetched)"
+          :done="user.posts.length === user.postsCount"
+        />
       </div>
     </div>
   </div>
@@ -26,6 +30,7 @@
 <script setup>
   import PostList from '@/components/PostList.vue'
   import { computed } from 'vue'
+  import AppInfiniteScroll from '../components/AppInfiniteScroll.vue'
   import UserProfileCard from '../components/UserProfileCard.vue'
   import UserProfileCardEditor from '../components/UserProfileCardEditor.vue'
   import { useProgressBar } from '../composables/useProgressBar'
@@ -40,10 +45,14 @@
   const authStore = useAuthStore()
 
   const user = computed(() => usersStore.user(authStore.authId))
+  const lastPostFetched = computed(() => {
+    if (user.value.posts.length === 0) return null
+    return user.value.posts[user.value.posts.length - 1]
+  })
 
   const { start, end } = useProgressBar()
 
   start()
-  await authStore.fetchAuthUserPosts()
+  await authStore.fetchAuthUserPosts(lastPostFetched.value)
   end()
 </script>

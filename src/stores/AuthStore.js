@@ -7,7 +7,18 @@ import {
   signInWithPopup,
   signOut as signOutFirebase,
 } from 'firebase/auth'
-import { collection, doc, getDoc, getDocs, getFirestore, query, where } from 'firebase/firestore'
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  getFirestore,
+  limit,
+  orderBy,
+  query,
+  startAfter,
+  where,
+} from 'firebase/firestore'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { fetchItem } from '../api'
@@ -37,10 +48,25 @@ export const useAuthStore = defineStore('AuthStore', () => {
     setAuthId(authUser?.id)
   }
 
-  const fetchAuthUserPosts = async () => {
-    const q = query(collection(db, 'posts'), where('userId', '==', authId.value))
-    const querySnapshot = await getDocs(q)
-    querySnapshot.forEach((post) => postsStore.setPost(post))
+  const fetchAuthUserPosts = async (lastVisible) => {
+    let postsQuery = null
+    const commonConstraints = [
+      collection(db, 'posts'),
+      where('userId', '==', authId.value),
+      orderBy('publishedAt', 'desc'),
+      limit(2),
+    ]
+
+    if (lastVisible) {
+      const postRef = doc(db, 'posts', lastVisible.id)
+      const lastPost = await getDoc(postRef)
+      postsQuery = query(...commonConstraints, startAfter(lastPost))
+    } else {
+      postsQuery = query(...commonConstraints)
+    }
+
+    const posts = await getDocs(postsQuery)
+    posts.forEach((post) => postsStore.setPost(post))
   }
 
   const initAuthentication = () => {
