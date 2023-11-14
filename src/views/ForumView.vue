@@ -9,8 +9,8 @@
         <RouterLink
           :to="{ name: 'ThreadCreate', params: { forumId: forum.id } }"
           class="btn-green btn-small"
-          >New thread</RouterLink
-        >
+          >New thread
+        </RouterLink>
       </div>
     </div>
     <div class="push-top">
@@ -28,6 +28,7 @@
   import ThreadList from '@/components/ThreadList.vue'
   import { useProgressBar } from '@/composables/useProgressBar'
   import { computed, ref, watch } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
   import { useForumsStore } from '../stores/ForumsStore'
   import { useThreadsStore } from '../stores/ThreadsStore'
   import { useUsersStore } from '../stores/UsersStore'
@@ -35,6 +36,9 @@
   const props = defineProps({
     id: { type: String, required: true },
   })
+
+  const router = useRouter()
+  const route = useRoute()
 
   const { start, end } = useProgressBar()
 
@@ -47,7 +51,7 @@
   const usersStore = useUsersStore()
   const { fetchUsers } = usersStore
 
-  const page = ref(1)
+  const page = ref(parseInt(route.query.page) || 1)
   const perPage = ref(10)
   const forum = ref()
   const threads = ref()
@@ -63,9 +67,10 @@
   threads.value = fetchedThreads
   end()
 
-  watch(page, async () => {
-    threads.value = await fetchThreadsByPage(forum.value.threads, page.value, perPage.value)
-    const userIds = threads.value.map((thread) => thread.userId)
-    await fetchUsers(userIds)
+  watch(page, (newPage) => {
+    router.push({ query: { page: newPage } })
+    // threads.value = await fetchThreadsByPage(forum.value.threads, page.value, perPage.value)
+    // const userIds = threads.value.map((thread) => thread.userId)
+    // await fetchUsers(userIds)
   })
 </script>
