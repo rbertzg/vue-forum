@@ -1,13 +1,10 @@
 <template>
   <TheNavigation />
   <div class="container">
-    <RouterView v-slot="{ Component, route }">
+    <RouterView v-slot="{ Component }">
       <template v-if="Component">
         <Suspense>
-          <component
-            :is="Component"
-            :key="route.fullPath"
-          ></component>
+          <component :is="Component"></component>
           <template #fallback> <AppSpinner /></template>
         </Suspense>
       </template>
